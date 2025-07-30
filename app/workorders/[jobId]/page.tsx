@@ -90,6 +90,15 @@ export default function WorkOrderDetailPage() {
   // Get current role from URL or localStorage (for demo purposes)
   const [currentRole, setCurrentRole] = useState('pm'); // Default to PM for demo
   
+  // Check URL parameters for role on mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const roleFromUrl = urlParams.get('role');
+    if (roleFromUrl) {
+      setCurrentRole(roleFromUrl);
+    }
+  }, []);
+  
   // Check if user is a technician
   const isTechnician = currentRole === 'technician';
   
@@ -489,12 +498,28 @@ export default function WorkOrderDetailPage() {
               <Button
                 variant="ghost"
                 onClick={() => {
-                  // Ensure we navigate to the correct dashboard based on current role
+                  // Check for returnTo parameter in URL
+                  const urlParams = new URLSearchParams(window.location.search);
+                  const returnTo = urlParams.get('returnTo');
                   const role = currentRole || localStorage.getItem('currentRole') || 'pm';
-                  if (role === 'owner') {
+                  
+                  if (returnTo === 'expenses' && role === 'owner') {
                     router.push('/owner?tab=expenses');
+                  } else if (returnTo === 'technicianExpenses') {
+                    router.push(`/?tab=technicianExpenses&role=technician`);
+                  } else if (returnTo === 'transactions' && role === 'centralOffice') {
+                    router.push(`/?tab=transactions&role=centralOffice`);
+                  } else if (returnTo === 'wallet' && role === 'pm') {
+                    router.push(`/?tab=wallet&role=pm`);
+                  } else if (returnTo === 'transactions' && role === 'pm') {
+                    router.push(`/?tab=transactions&role=pm`);
                   } else {
-                    router.push(`/?tab=workorders&role=${role}`);
+                    // Default navigation
+                    if (role === 'owner') {
+                      router.push('/owner?tab=expenses');
+                    } else {
+                      router.push(`/?tab=workorders&role=${role}`);
+                    }
                   }
                 }}
                 className="text-gray-300 hover:text-white hover:bg-blue-600/20 border border-transparent hover:border-blue-500/30"

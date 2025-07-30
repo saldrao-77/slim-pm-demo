@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import { useRouter } from 'next/navigation'
 import { DialogFooter } from "@/components/ui/dialog"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
@@ -11,7 +12,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -96,10 +97,9 @@ import {
   Save
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useRouter } from 'next/navigation'
 import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, LineChart, Line } from 'recharts';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
-import { jobsList, activityMilestones, jobNotes, activityFiles, collateralDocuments, documentTypeLabels, propertyOptions, staffOptions, DocumentType, CollateralDocument, bankAccounts, ownerTrustAccounts, invoices, creditCards, teamMembers } from './mockData';
+import { jobsList, activityMilestones, jobNotes, activityFiles, collateralDocuments, documentTypeLabels, propertyOptions, areaOptions, staffOptions, DocumentType, CollateralDocument, bankAccounts, ownerTrustAccounts, invoices, creditCards, teamMembers } from './mockData';
 
 // Sample staff list
 const staffList = [
@@ -846,36 +846,115 @@ function BudgetingTab() {
     aggressiveGrowth: false,
     freeformNotes: ''
   })
+  const [expandedSubGL, setExpandedSubGL] = useState<Set<number>>(new Set())
+  const [accountingMethod, setAccountingMethod] = useState<'cash' | 'accrual'>('accrual')
+  const [uploadDialog, setUploadDialog] = useState<'chartOfAccounts' | null>(null)
+  const [previousBudgetFile, setPreviousBudgetFile] = useState<File | null>(null)
 
     // Property budget data structure
   const properties = [
-    { id: 'prop1', name: 'Stanford Graduate School of Business' },
-    { id: 'prop2', name: 'Mission Bay Tech Campus' },
-    { id: 'prop3', name: 'Redwood Shores Office Complex' }
+    { id: 'prop1', name: '01 STANFORD' },
+    { id: 'prop2', name: '02 MISSION BAY' },
+    { id: 'prop3', name: '03 REDWOOD' }
   ]
+
+  // Sub GL accounts data
+  const subGLAccounts = {
+    412: [ // Rent Income sub accounts
+      { subAccount: '412.1', name: 'Base Rent', lastYear: 2200000, budget2025: 2300000, ytdActual: 1340000 },
+      { subAccount: '412.2', name: 'Late Fees', lastYear: 120000, budget2025: 130000, ytdActual: 75000 },
+      { subAccount: '412.3', name: 'Rent Escalations', lastYear: 80000, budget2025: 90000, ytdActual: 45000 }
+    ],
+    413: [ // Renters Insurance Income sub accounts
+      { subAccount: '413.1', name: 'Insurance Commission', lastYear: 15000, budget2025: 16000, ytdActual: 9000 },
+      { subAccount: '413.2', name: 'Administrative Fee', lastYear: 9000, budget2025: 10000, ytdActual: 6000 }
+    ],
+    414: [ // Repairs Income sub accounts
+      { subAccount: '414.1', name: 'Tenant Damage Reimbursement', lastYear: 12000, budget2025: 13000, ytdActual: 8000 },
+      { subAccount: '414.2', name: 'Insurance Claims', lastYear: 6000, budget2025: 7000, ytdActual: 4000 }
+    ],
+    415: [ // Utility Income sub accounts
+      { subAccount: '415.1', name: 'Electricity Reimbursement', lastYear: 85000, budget2025: 90000, ytdActual: 52000 },
+      { subAccount: '415.2', name: 'Water/Sewer Reimbursement', lastYear: 35000, budget2025: 38000, ytdActual: 22000 },
+      { subAccount: '415.3', name: 'Gas Reimbursement', lastYear: 25000, budget2025: 27000, ytdActual: 15000 }
+    ],
+    416: [ // Pet Fee Income sub accounts
+      { subAccount: '416.1', name: 'Pet Deposits', lastYear: 20000, budget2025: 22000, ytdActual: 13000 },
+      { subAccount: '416.2', name: 'Monthly Pet Fees', lastYear: 16000, budget2025: 17000, ytdActual: 9500 }
+    ],
+    505: [ // Cleaning and Maintenance sub accounts
+      { subAccount: '505.1', name: 'Regular Cleaning', lastYear: 120000, budget2025: 125000, ytdActual: 72000 },
+      { subAccount: '505.2', name: 'Deep Cleaning', lastYear: 35000, budget2025: 35000, ytdActual: 20000 },
+      { subAccount: '505.3', name: 'Maintenance Supplies', lastYear: 25000, budget2025: 25000, ytdActual: 16000 }
+    ],
+    509: [ // Insurance sub accounts
+      { subAccount: '509.1', name: 'Property Insurance', lastYear: 65000, budget2025: 70000, ytdActual: 35000 },
+      { subAccount: '509.2', name: 'Liability Insurance', lastYear: 20000, budget2025: 22000, ytdActual: 11000 },
+      { subAccount: '509.3', name: 'Workers Comp', lastYear: 10000, budget2025: 10000, ytdActual: 5000 }
+    ],
+    510: [ // Landscaping sub accounts
+      { subAccount: '510.1', name: 'Regular Maintenance', lastYear: 45000, budget2025: 48000, ytdActual: 28000 },
+      { subAccount: '510.2', name: 'Seasonal Plantings', lastYear: 15000, budget2025: 16000, ytdActual: 9000 },
+      { subAccount: '510.3', name: 'Irrigation', lastYear: 8000, budget2025: 8000, ytdActual: 5000 }
+    ],
+    511: [ // Legal and Professional Fees sub accounts
+      { subAccount: '511.1', name: 'Legal Fees', lastYear: 25000, budget2025: 30000, ytdActual: 18000 },
+      { subAccount: '511.2', name: 'Accounting Fees', lastYear: 15000, budget2025: 15000, ytdActual: 8000 },
+      { subAccount: '511.3', name: 'Consulting Fees', lastYear: 5000, budget2025: 5000, ytdActual: 2000 }
+    ],
+    513: [ // Management Fees sub accounts
+      { subAccount: '513.1', name: 'Base Management Fee', lastYear: 120000, budget2025: 126000, ytdActual: 73000 },
+      { subAccount: '513.2', name: 'Leasing Fees', lastYear: 24000, budget2025: 25200, ytdActual: 14600 }
+    ],
+    522: [ // Repairs sub accounts
+      { subAccount: '522.1', name: 'Emergency Repairs', lastYear: 45000, budget2025: 50000, ytdActual: 28000 },
+      { subAccount: '522.2', name: 'Scheduled Maintenance', lastYear: 25000, budget2025: 25000, ytdActual: 15000 },
+      { subAccount: '522.3', name: 'Tenant Damage Repairs', lastYear: 15000, budget2025: 15000, ytdActual: 9000 }
+    ],
+    524: [ // Appliance Repairs sub accounts
+      { subAccount: '524.1', name: 'HVAC Appliances', lastYear: 18000, budget2025: 20000, ytdActual: 10000 },
+      { subAccount: '524.2', name: 'Kitchen Appliances', lastYear: 14000, budget2025: 15000, ytdActual: 8000 }
+    ],
+    525: [ // Bathroom Repairs sub accounts
+      { subAccount: '525.1', name: 'Plumbing Fixtures', lastYear: 15000, budget2025: 16000, ytdActual: 8000 },
+      { subAccount: '525.2', name: 'Tile and Flooring', lastYear: 13000, budget2025: 14000, ytdActual: 7000 }
+    ],
+    537: [ // Electric sub accounts
+      { subAccount: '537.1', name: 'Common Area Electric', lastYear: 110000, budget2025: 98000, ytdActual: 56000 },
+      { subAccount: '537.2', name: 'Unit Electric', lastYear: 75000, budget2025: 67000, ytdActual: 39000 }
+    ],
+    538: [ // Gas sub accounts
+      { subAccount: '538.1', name: 'Heating Gas', lastYear: 45000, budget2025: 48000, ytdActual: 27000 },
+      { subAccount: '538.2', name: 'Hot Water Gas', lastYear: 23000, budget2025: 24000, ytdActual: 14000 }
+    ],
+    539: [ // Water/Sewer sub accounts
+      { subAccount: '539.1', name: 'Water Usage', lastYear: 65000, budget2025: 60000, ytdActual: 35000 },
+      { subAccount: '539.2', name: 'Sewer Fees', lastYear: 30000, budget2025: 28000, ytdActual: 17000 }
+    ]
+  }
 
   // Complete GL Chart of Accounts structure based on provided chart
   const chartOfAccounts = {
     // Income Accounts (4000s)
     income: [
-      { account: 412, name: 'Rent Income', type: 'Income', lastYear: 2400000, budget2025: 2520000, ytdActual: 1460000, aiGenerated: true, rationale: 'AI: 5% increase based on market rates + 2 new leases' },
-      { account: 413, name: 'Renters Insurance Income', type: 'Income', lastYear: 24000, budget2025: 26000, ytdActual: 15000, aiGenerated: true, rationale: 'AI: Optional insurance program growth' },
-      { account: 414, name: 'Repairs Income', type: 'Income', lastYear: 18000, budget2025: 20000, ytdActual: 12000, aiGenerated: true, rationale: 'AI: Tenant-caused damage reimbursements' },
-      { account: 415, name: 'Utility Income', type: 'Income', lastYear: 145000, budget2025: 155000, ytdActual: 89000, aiGenerated: true, rationale: 'AI: Utility reimbursement from tenants, 7% rate increase' },
-      { account: 416, name: 'Pet Fee Income', type: 'Income', lastYear: 36000, budget2025: 39000, ytdActual: 22500, aiGenerated: true, rationale: 'AI: Pet policy expansion, $50/month per pet' }
+      { account: 412, name: 'Rent Income', type: 'Income', lastYear: 2400000, budget2025: 2520000, ytdActual: 1460000, aiGenerated: true, rationale: 'AI: 5% increase based on market rates + 2 new leases', hasSubGL: true },
+      { account: 413, name: 'Renters Insurance Income', type: 'Income', lastYear: 24000, budget2025: 26000, ytdActual: 15000, aiGenerated: true, rationale: 'AI: Optional insurance program growth', hasSubGL: true },
+      { account: 414, name: 'Repairs Income', type: 'Income', lastYear: 18000, budget2025: 20000, ytdActual: 12000, aiGenerated: true, rationale: 'AI: Tenant-caused damage reimbursements', hasSubGL: true },
+      { account: 415, name: 'Utility Income', type: 'Income', lastYear: 145000, budget2025: 155000, ytdActual: 89000, aiGenerated: true, rationale: 'AI: Utility reimbursement from tenants, 7% rate increase', hasSubGL: true },
+      { account: 416, name: 'Pet Fee Income', type: 'Income', lastYear: 36000, budget2025: 39000, ytdActual: 22500, aiGenerated: true, rationale: 'AI: Pet policy expansion, $50/month per pet', hasSubGL: true }
     ],
     // Operating Expenses (5000s)
     operatingExpenses: [
-      { account: 505, name: 'Cleaning and Maintenance', type: 'Operating Expenses', lastYear: 180000, budget2025: 185000, ytdActual: 108000, aiGenerated: true, rationale: 'AI: Contract renewal +2.8% inflation adjustment' },
-      { account: 509, name: 'Insurance', type: 'Operating Expenses', lastYear: 95000, budget2025: 102000, ytdActual: 51000, aiGenerated: true, rationale: 'AI: Property insurance +7% premium increase' },
-      { account: 510, name: 'Landscaping', type: 'Operating Expenses', lastYear: 68000, budget2025: 72000, ytdActual: 42000, aiGenerated: true, rationale: 'AI: Drought-resistant plants reducing water costs' },
-      { account: 511, name: 'Legal and Professional Fees', type: 'Operating Expenses', lastYear: 45000, budget2025: 50000, ytdActual: 28000, aiGenerated: false, rationale: 'Manual: Anticipated legal work for lease updates' },
-      { account: 513, name: 'Management Fees', type: 'Operating Expenses', lastYear: 144000, budget2025: 151200, ytdActual: 87600, aiGenerated: true, rationale: 'AI: 6% of gross rent income' },
+      { account: 505, name: 'Cleaning and Maintenance', type: 'Operating Expenses', lastYear: 180000, budget2025: 185000, ytdActual: 108000, aiGenerated: true, rationale: 'AI: Contract renewal +2.8% inflation adjustment', hasSubGL: true },
+      { account: 509, name: 'Insurance', type: 'Operating Expenses', lastYear: 95000, budget2025: 102000, ytdActual: 51000, aiGenerated: true, rationale: 'AI: Property insurance +7% premium increase', hasSubGL: true },
+      { account: 510, name: 'Landscaping', type: 'Operating Expenses', lastYear: 68000, budget2025: 72000, ytdActual: 42000, aiGenerated: true, rationale: 'AI: Drought-resistant plants reducing water costs', hasSubGL: true },
+      { account: 511, name: 'Legal and Professional Fees', type: 'Operating Expenses', lastYear: 45000, budget2025: 50000, ytdActual: 28000, aiGenerated: false, rationale: 'Manual: Anticipated legal work for lease updates', hasSubGL: true },
+      { account: 513, name: 'Management Fees', type: 'Operating Expenses', lastYear: 144000, budget2025: 151200, ytdActual: 87600, aiGenerated: true, rationale: 'AI: 6% of gross rent income', hasSubGL: true },
       
       // Repairs subcategories
-      { account: 522, name: 'Repairs', type: 'Operating Expenses', lastYear: 85000, budget2025: 90000, ytdActual: 52000, aiGenerated: true, rationale: 'AI: General repair reserves' },
-      { account: 524, name: 'Appliance Repairs', type: 'Operating Expenses', lastYear: 32000, budget2025: 35000, ytdActual: 18000, aiGenerated: true, rationale: 'AI: Aging appliances require more service' },
-      { account: 525, name: 'Bathroom Repairs', type: 'Operating Expenses', lastYear: 28000, budget2025: 30000, ytdActual: 15000, aiGenerated: true, rationale: 'AI: Fixture replacements scheduled' },
+      { account: 522, name: 'Repairs', type: 'Operating Expenses', lastYear: 85000, budget2025: 90000, ytdActual: 52000, aiGenerated: true, rationale: 'AI: General repair reserves', hasSubGL: true },
+      { account: 524, name: 'Appliance Repairs', type: 'Operating Expenses', lastYear: 32000, budget2025: 35000, ytdActual: 18000, aiGenerated: true, rationale: 'AI: Aging appliances require more service', hasSubGL: true },
+      { account: 525, name: 'Bathroom Repairs', type: 'Operating Expenses', lastYear: 28000, budget2025: 30000, ytdActual: 15000, aiGenerated: true, rationale: 'AI: Fixture replacements scheduled', hasSubGL: true },
       { account: 526, name: 'Electrical Repairs', type: 'Operating Expenses', lastYear: 42000, budget2025: 45000, ytdActual: 26000, aiGenerated: true, rationale: 'AI: Panel upgrades in progress' },
       { account: 527, name: 'Flooring Repairs', type: 'Operating Expenses', lastYear: 55000, budget2025: 60000, ytdActual: 32000, aiGenerated: true, rationale: 'AI: High-traffic area replacements' },
       { account: 529, name: 'HVAC Repairs', type: 'Operating Expenses', lastYear: 125000, budget2025: 140000, ytdActual: 78000, aiGenerated: true, rationale: 'AI: Equipment age analysis suggests increased maintenance' },
@@ -883,10 +962,10 @@ function BudgetingTab() {
       { account: 531, name: 'Plumbing Repairs', type: 'Operating Expenses', lastYear: 67000, budget2025: 65000, ytdActual: 35000, aiGenerated: true, rationale: 'AI: Recent pipe replacements reducing future costs' },
       
       // Utilities
-      { account: 536, name: 'Utilities', type: 'Operating Expenses', lastYear: 0, budget2025: 0, ytdActual: 0, aiGenerated: true, rationale: 'AI: Parent category - see subcategories below' },
-      { account: 537, name: 'Electric', type: 'Operating Expenses', lastYear: 185000, budget2025: 165000, ytdActual: 95000, aiGenerated: true, rationale: 'AI: LED upgrades + solar panels = 11% reduction estimated', utilityRate: '$0.32/kWh', utilityEstimate: '515,625 kWh annually' },
-      { account: 538, name: 'Gas', type: 'Operating Expenses', lastYear: 68000, budget2025: 72000, ytdActual: 41000, aiGenerated: true, rationale: 'AI: Winter heating + 6% rate increase', utilityRate: '$1.20/therm', utilityEstimate: '60,000 therms annually' },
-      { account: 539, name: 'Water/Sewer', type: 'Operating Expenses', lastYear: 95000, budget2025: 88000, ytdActual: 52000, aiGenerated: true, rationale: 'AI: Water-efficient fixtures installed, 7% reduction', utilityRate: '$12.50/CCF', utilityEstimate: '7,040 CCF annually' },
+      { account: 536, name: 'Utilities', type: 'Operating Expenses', lastYear: 0, budget2025: 0, ytdActual: 0, aiGenerated: true, rationale: 'AI: Parent category - see subcategories below', hasSubGL: false },
+      { account: 537, name: 'Electric', type: 'Operating Expenses', lastYear: 185000, budget2025: 165000, ytdActual: 95000, aiGenerated: true, rationale: 'AI: LED upgrades + solar panels = 11% reduction estimated', utilityRate: '$0.32/kWh', utilityEstimate: '515,625 kWh annually', hasSubGL: true },
+      { account: 538, name: 'Gas', type: 'Operating Expenses', lastYear: 68000, budget2025: 72000, ytdActual: 41000, aiGenerated: true, rationale: 'AI: Winter heating + 6% rate increase', utilityRate: '$1.20/therm', utilityEstimate: '60,000 therms annually', hasSubGL: true },
+      { account: 539, name: 'Water/Sewer', type: 'Operating Expenses', lastYear: 95000, budget2025: 88000, ytdActual: 52000, aiGenerated: true, rationale: 'AI: Water-efficient fixtures installed, 7% reduction', utilityRate: '$12.50/CCF', utilityEstimate: '7,040 CCF annually', hasSubGL: true },
       { account: 540, name: 'Trash', type: 'Operating Expenses', lastYear: 24000, budget2025: 25000, ytdActual: 14500, aiGenerated: true, rationale: 'AI: Waste contract renewal +4% increase' }
     ],
     // Fixed Assets / Capital Improvements (100s)
@@ -1001,6 +1080,90 @@ function BudgetingTab() {
     setEditingLineItem(null)
   }
 
+  const toggleSubGL = (accountNumber: number) => {
+    const newExpanded = new Set(expandedSubGL)
+    if (newExpanded.has(accountNumber)) {
+      newExpanded.delete(accountNumber)
+    } else {
+      newExpanded.add(accountNumber)
+    }
+    setExpandedSubGL(newExpanded)
+  }
+
+  const handleExportToXLS = () => {
+    // Create CSV content (Excel will open CSV files)
+    const csvContent = [
+      ['Account #', 'Account Name', 'Type', 'Last Year Actual', '2025 Budget', 'YTD Actual', 'Variance %', 'AI Rationale'],
+      ...chartOfAccounts.income.map(item => {
+        const variance = ((item.ytdActual / (item.budget2025 * 0.58)) * 100) - 100
+        return [
+          item.account,
+          item.name,
+          item.type,
+          item.lastYear,
+          item.budget2025,
+          item.ytdActual,
+          variance.toFixed(1) + '%',
+          item.rationale
+        ]
+      }),
+      ...chartOfAccounts.operatingExpenses.map(item => {
+        const variance = ((item.ytdActual / (item.budget2025 * 0.58)) * 100) - 100
+        return [
+          item.account,
+          item.name,
+          item.type,
+          item.lastYear,
+          item.budget2025,
+          item.ytdActual,
+          variance.toFixed(1) + '%',
+          item.rationale
+        ]
+      }),
+      ...chartOfAccounts.capitalImprovements.map(item => {
+        const variance = ((item.ytdActual / (item.budget2025 * 0.58)) * 100) - 100
+        return [
+          item.account,
+          item.name,
+          item.type,
+          item.lastYear,
+          item.budget2025,
+          item.ytdActual,
+          variance.toFixed(1) + '%',
+          item.rationale
+        ]
+      })
+    ].map(row => row.join(',')).join('\n')
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `budget_${selectedPropertyName.replace(/\s+/g, '_')}_${selectedBudgetYear}.csv`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>, type: 'chartOfAccounts' | 'previousBudget') => {
+    const file = event.target.files?.[0]
+    if (file) {
+      console.log(`Uploading ${type}:`, file.name)
+      if (type === 'chartOfAccounts') {
+        alert(`Chart of Accounts file "${file.name}" uploaded successfully!`)
+        setUploadDialog(null)
+      } else if (type === 'previousBudget') {
+        setPreviousBudgetFile(file)
+        console.log(`Previous budget file "${file.name}" selected for AI analysis`)
+      }
+    }
+  }
+
+  const handlePreviousBudgetRemove = () => {
+    setPreviousBudgetFile(null)
+  }
+
   const totals = calculateTotals()
   const selectedPropertyName = properties.find(p => p.id === selectedProperty)?.name || 'Unknown Property'
 
@@ -1010,11 +1173,33 @@ function BudgetingTab() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-white">Budget: {selectedPropertyName}</h2>
-          <p className="text-gray-400">General Ledger Budget for {selectedBudgetYear}</p>
+          <div className="flex items-center gap-4">
+            <p className="text-gray-400">General Ledger Budget for {selectedBudgetYear}</p>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-400">Accounting Method:</span>
+              <Select value={accountingMethod} onValueChange={(value: 'cash' | 'accrual') => setAccountingMethod(value)}>
+                <SelectTrigger className="w-24 bg-gray-800 border-gray-600 text-white text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-600">
+                  <SelectItem value="accrual" className="text-white">Accrual</SelectItem>
+                  <SelectItem value="cash" className="text-white">Cash</SelectItem>
+                </SelectContent>
+              </Select>
+              <div className="group relative">
+                <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-80 bg-gray-900 border border-gray-600 rounded-lg p-3 text-sm text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                  <div className="font-medium text-white mb-1">Accounting Methods:</div>
+                  <div className="mb-2"><span className="font-medium text-blue-300">Accrual:</span> Records income when earned and expenses when incurred, regardless of cash flow. Provides accurate financial position.</div>
+                  <div><span className="font-medium text-green-300">Cash:</span> Records transactions only when money changes hands. Shows actual cash flow but may not reflect true financial health.</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <Select value={selectedProperty} onValueChange={setSelectedProperty}>
-            <SelectTrigger className="w-64 bg-gray-800 border-gray-600 text-white">
+            <SelectTrigger className="w-52 bg-gray-800 border-gray-600 text-white">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-gray-800 border-gray-600">
@@ -1024,7 +1209,7 @@ function BudgetingTab() {
             </SelectContent>
           </Select>
           <Select value={selectedBudgetYear} onValueChange={setSelectedBudgetYear}>
-            <SelectTrigger className="w-32 bg-gray-800 border-gray-600 text-white">
+            <SelectTrigger className="w-20 bg-gray-800 border-gray-600 text-white">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-gray-800 border-gray-600">
@@ -1034,12 +1219,28 @@ function BudgetingTab() {
             </SelectContent>
           </Select>
           <Button 
+            onClick={() => setUploadDialog('chartOfAccounts')}
+            variant="outline"
+            className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            Upload COA
+          </Button>
+          <Button 
+            onClick={handleExportToXLS}
+            variant="outline"
+            className="bg-green-600 border-green-600 text-white hover:bg-green-700"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export XLS
+          </Button>
+          <Button 
             onClick={handleAiGenerate}
             variant="outline"
             className="bg-purple-600 border-purple-600 text-white hover:bg-purple-700"
           >
             <Bot className="h-4 w-4 mr-2" />
-            AI Generate
+            Generate
           </Button>
           <Button 
             onClick={() => setShareWithOwnerDialog(true)}
@@ -1139,46 +1340,82 @@ function BudgetingTab() {
               <tbody>
                 {chartOfAccounts.income.map((item) => {
                   const variance = ((item.ytdActual / (item.budget2025 * 0.58)) * 100) - 100 // Assuming 58% through year
+                  const hasSubAccounts = item.hasSubGL && subGLAccounts[item.account]
+                  const isExpanded = expandedSubGL.has(item.account)
+                  
                   return (
-                    <tr key={item.account} className="border-b border-gray-700 hover:bg-gray-700/50">
-                      <td className="py-3 px-4 text-blue-300 font-mono">{item.account}</td>
-                      <td className="py-3 px-4 text-white font-medium">{item.name}</td>
-                      <td className="py-3 px-4 text-right text-gray-300">${item.lastYear.toLocaleString()}</td>
-                      <td className="py-3 px-4 text-right text-white font-medium">
-                        {editingLineItem === item.account.toString() ? (
-                          <Input
-                            type="number"
-                            defaultValue={item.budget2025}
-                            className="w-32 text-right bg-gray-700 border-gray-600 text-white"
-                            onBlur={(e) => handleSaveLineItem(item.account, parseInt(e.target.value))}
-                            onKeyDown={(e) => e.key === 'Enter' && handleSaveLineItem(item.account, parseInt((e.target as HTMLInputElement).value))}
-                            autoFocus
-                          />
-                        ) : (
-                          `$${item.budget2025.toLocaleString()}`
-                        )}
-                      </td>
-                      <td className="py-3 px-4 text-right text-green-300">${item.ytdActual.toLocaleString()}</td>
-                      <td className={`py-3 px-4 text-right font-medium ${variance > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                        {variance > 0 ? '+' : ''}{variance.toFixed(1)}%
-                      </td>
-                      <td className="py-3 px-4 text-gray-300 max-w-xs">
-                        <div className="flex items-center gap-2">
-                          {item.aiGenerated && <Bot className="h-3 w-3 text-purple-400 flex-shrink-0" />}
-                          <span className="truncate">{item.rationale}</span>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4 text-center">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEditLineItem(item.account)}
-                          className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
-                        >
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                      </td>
-                    </tr>
+                    <React.Fragment key={item.account}>
+                      <tr className="border-b border-gray-700 hover:bg-gray-700/50">
+                        <td className="py-3 px-4 text-blue-300 font-mono">
+                          <div className="flex items-center gap-2">
+                            {hasSubAccounts && (
+                              <button
+                                onClick={() => toggleSubGL(item.account)}
+                                className="text-gray-400 hover:text-white transition-colors"
+                              >
+                                <ChevronDown className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                              </button>
+                            )}
+                            {item.account}
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-white font-medium">{item.name}</td>
+                        <td className="py-3 px-4 text-right text-gray-300">${item.lastYear.toLocaleString()}</td>
+                        <td className="py-3 px-4 text-right text-white font-medium">
+                          {editingLineItem === item.account.toString() ? (
+                            <Input
+                              type="number"
+                              defaultValue={item.budget2025}
+                              className="w-32 text-right bg-gray-700 border-gray-600 text-white"
+                              onBlur={(e) => handleSaveLineItem(item.account, parseInt(e.target.value))}
+                              onKeyDown={(e) => e.key === 'Enter' && handleSaveLineItem(item.account, parseInt((e.target as HTMLInputElement).value))}
+                              autoFocus
+                            />
+                          ) : (
+                            `$${item.budget2025.toLocaleString()}`
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-right text-green-300">${item.ytdActual.toLocaleString()}</td>
+                        <td className={`py-3 px-4 text-right font-medium ${variance > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                          {variance > 0 ? '+' : ''}{variance.toFixed(1)}%
+                        </td>
+                        <td className="py-3 px-4 text-gray-300 max-w-xs">
+                          <div className="flex items-center gap-2">
+                            {item.aiGenerated && <Bot className="h-3 w-3 text-purple-400 flex-shrink-0" />}
+                            <span className="truncate">{item.rationale}</span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEditLineItem(item.account)}
+                            className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
+                          >
+                            <Edit className="h-3 w-3" />
+                          </Button>
+                        </td>
+                      </tr>
+                      
+                      {/* Sub GL Accounts */}
+                      {hasSubAccounts && isExpanded && subGLAccounts[item.account].map((subItem) => {
+                        const subVariance = ((subItem.ytdActual / (subItem.budget2025 * 0.58)) * 100) - 100
+                        return (
+                          <tr key={subItem.subAccount} className="border-b border-gray-700 hover:bg-gray-700/30 bg-gray-800/50">
+                            <td className="py-2 px-4 pl-12 text-blue-200 font-mono text-sm">{subItem.subAccount}</td>
+                            <td className="py-2 px-4 text-gray-300 text-sm">{subItem.name}</td>
+                            <td className="py-2 px-4 text-right text-gray-400 text-sm">${subItem.lastYear.toLocaleString()}</td>
+                            <td className="py-2 px-4 text-right text-gray-300 text-sm">${subItem.budget2025.toLocaleString()}</td>
+                            <td className="py-2 px-4 text-right text-green-200 text-sm">${subItem.ytdActual.toLocaleString()}</td>
+                            <td className={`py-2 px-4 text-right text-sm ${subVariance > 0 ? 'text-green-300' : 'text-red-300'}`}>
+                              {subVariance > 0 ? '+' : ''}{subVariance.toFixed(1)}%
+                            </td>
+                            <td className="py-2 px-4 text-gray-500 text-sm">Sub-account detail</td>
+                            <td className="py-2 px-4"></td>
+                          </tr>
+                        )
+                      })}
+                    </React.Fragment>
                   )
                 })}
               </tbody>
@@ -1214,54 +1451,91 @@ function BudgetingTab() {
               <tbody>
                 {chartOfAccounts.operatingExpenses.map((item) => {
                   const variance = ((item.ytdActual / (item.budget2025 * 0.58)) * 100) - 100
+                  const hasSubAccounts = item.hasSubGL && subGLAccounts[item.account]
+                  const isExpanded = expandedSubGL.has(item.account)
+                  
                   return (
-                    <tr key={item.account} className="border-b border-gray-700 hover:bg-gray-700/50">
-                      <td className="py-3 px-4 text-red-300 font-mono">{item.account}</td>
-                      <td className="py-3 px-4 text-white font-medium">{item.name}</td>
-                      <td className="py-3 px-4 text-right text-gray-300">${item.lastYear.toLocaleString()}</td>
-                      <td className="py-3 px-4 text-right text-white font-medium">
-                        {editingLineItem === item.account.toString() ? (
-                          <Input
-                            type="number"
-                            defaultValue={item.budget2025}
-                            className="w-32 text-right bg-gray-700 border-gray-600 text-white"
-                            onBlur={(e) => handleSaveLineItem(item.account, parseInt(e.target.value))}
-                            onKeyDown={(e) => e.key === 'Enter' && handleSaveLineItem(item.account, parseInt((e.target as HTMLInputElement).value))}
-                            autoFocus
-                          />
-                        ) : (
-                          `$${item.budget2025.toLocaleString()}`
-                        )}
-                      </td>
-                      <td className="py-3 px-4 text-right text-red-300">${item.ytdActual.toLocaleString()}</td>
-                      <td className={`py-3 px-4 text-right font-medium ${variance < 0 ? 'text-green-400' : 'text-red-400'}`}>
-                        {variance > 0 ? '+' : ''}{variance.toFixed(1)}%
-                      </td>
-                      <td className="py-3 px-4 text-gray-300 max-w-xs">
-                        <div className="flex items-center gap-2">
-                          {item.aiGenerated && <Bot className="h-3 w-3 text-purple-400 flex-shrink-0" />}
-                          <span className="truncate">{item.rationale}</span>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4 text-gray-400 text-xs max-w-xs">
-                        {(item as any).utilityRate && (
-                          <div>
-                            <div>Rate: {(item as any).utilityRate}</div>
-                            <div>Est: {(item as any).utilityEstimate}</div>
+                    <React.Fragment key={item.account}>
+                      <tr className="border-b border-gray-700 hover:bg-gray-700/50">
+                        <td className="py-3 px-4 text-red-300 font-mono">
+                          <div className="flex items-center gap-2">
+                            {hasSubAccounts && (
+                              <button
+                                onClick={() => toggleSubGL(item.account)}
+                                className="text-gray-400 hover:text-white transition-colors"
+                              >
+                                <ChevronDown className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                              </button>
+                            )}
+                            {item.account}
                           </div>
-                        )}
-                      </td>
-                      <td className="py-3 px-4 text-center">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEditLineItem(item.account)}
-                          className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
-                        >
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                      </td>
-                    </tr>
+                        </td>
+                        <td className="py-3 px-4 text-white font-medium">{item.name}</td>
+                        <td className="py-3 px-4 text-right text-gray-300">${item.lastYear.toLocaleString()}</td>
+                        <td className="py-3 px-4 text-right text-white font-medium">
+                          {editingLineItem === item.account.toString() ? (
+                            <Input
+                              type="number"
+                              defaultValue={item.budget2025}
+                              className="w-32 text-right bg-gray-700 border-gray-600 text-white"
+                              onBlur={(e) => handleSaveLineItem(item.account, parseInt(e.target.value))}
+                              onKeyDown={(e) => e.key === 'Enter' && handleSaveLineItem(item.account, parseInt((e.target as HTMLInputElement).value))}
+                              autoFocus
+                            />
+                          ) : (
+                            `$${item.budget2025.toLocaleString()}`
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-right text-red-300">${item.ytdActual.toLocaleString()}</td>
+                        <td className={`py-3 px-4 text-right font-medium ${variance < 0 ? 'text-green-400' : 'text-red-400'}`}>
+                          {variance > 0 ? '+' : ''}{variance.toFixed(1)}%
+                        </td>
+                        <td className="py-3 px-4 text-gray-300 max-w-xs">
+                          <div className="flex items-center gap-2">
+                            {item.aiGenerated && <Bot className="h-3 w-3 text-purple-400 flex-shrink-0" />}
+                            <span className="truncate">{item.rationale}</span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-gray-400 text-xs max-w-xs">
+                          {(item as any).utilityRate && (
+                            <div>
+                              <div>Rate: {(item as any).utilityRate}</div>
+                              <div>Est: {(item as any).utilityEstimate}</div>
+                            </div>
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEditLineItem(item.account)}
+                            className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
+                          >
+                            <Edit className="h-3 w-3" />
+                          </Button>
+                        </td>
+                      </tr>
+                      
+                      {/* Sub GL Accounts */}
+                      {hasSubAccounts && isExpanded && subGLAccounts[item.account].map((subItem) => {
+                        const subVariance = ((subItem.ytdActual / (subItem.budget2025 * 0.58)) * 100) - 100
+                        return (
+                          <tr key={subItem.subAccount} className="border-b border-gray-700 hover:bg-gray-700/30 bg-gray-800/50">
+                            <td className="py-2 px-4 pl-12 text-red-200 font-mono text-sm">{subItem.subAccount}</td>
+                            <td className="py-2 px-4 text-gray-300 text-sm">{subItem.name}</td>
+                            <td className="py-2 px-4 text-right text-gray-400 text-sm">${subItem.lastYear.toLocaleString()}</td>
+                            <td className="py-2 px-4 text-right text-gray-300 text-sm">${subItem.budget2025.toLocaleString()}</td>
+                            <td className="py-2 px-4 text-right text-red-200 text-sm">${subItem.ytdActual.toLocaleString()}</td>
+                            <td className={`py-2 px-4 text-right text-sm ${subVariance < 0 ? 'text-green-300' : 'text-red-300'}`}>
+                              {subVariance > 0 ? '+' : ''}{subVariance.toFixed(1)}%
+                            </td>
+                            <td className="py-2 px-4 text-gray-500 text-sm">Sub-account detail</td>
+                            <td className="py-2 px-4"></td>
+                            <td className="py-2 px-4"></td>
+                          </tr>
+                        )
+                      })}
+                    </React.Fragment>
                   )
                 })}
               </tbody>
@@ -1566,6 +1840,62 @@ function BudgetingTab() {
               </div>
             </div>
 
+            {/* Previous Budget Upload */}
+            <div>
+              <Label className="text-gray-300 text-sm font-medium mb-3 block">Previous Year Budget (Optional)</Label>
+              <div className="border-2 border-dashed border-gray-600 rounded-lg p-6">
+                {previousBudgetFile ? (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <FileSpreadsheet className="h-8 w-8 text-green-400" />
+                      <div>
+                        <div className="text-white font-medium">{previousBudgetFile.name}</div>
+                        <div className="text-sm text-gray-400">
+                          {(previousBudgetFile.size / 1024 / 1024).toFixed(2)} MB • Ready for AI analysis
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handlePreviousBudgetRemove}
+                      className="bg-red-600 border-red-600 text-white hover:bg-red-700"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Remove
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <Upload className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+                    <p className="text-gray-300 mb-2">Upload previous year's budget for enhanced AI accuracy</p>
+                    <p className="text-sm text-gray-500 mb-4">CSV, XLS, XLSX supported • AI will analyze patterns and trends</p>
+                    <input
+                      type="file"
+                      accept=".csv,.xls,.xlsx"
+                      onChange={(e) => handleFileUpload(e, 'previousBudget')}
+                      className="hidden"
+                      id="previousBudgetUploadInline"
+                    />
+                    <label htmlFor="previousBudgetUploadInline">
+                      <Button variant="outline" className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600" asChild>
+                        <span>
+                          <Upload className="h-4 w-4 mr-2" />
+                          Choose Previous Budget File
+                        </span>
+                      </Button>
+                    </label>
+                  </div>
+                )}
+              </div>
+              {previousBudgetFile && (
+                <div className="mt-2 text-xs text-green-400 flex items-center gap-1">
+                  <CheckCircle className="h-3 w-3" />
+                  AI will use this budget as a baseline for more accurate projections
+                </div>
+              )}
+            </div>
+
             {/* Freeform Notes */}
             <div>
               <Label className="text-gray-300 text-sm font-medium">Special Instructions & Notes</Label>
@@ -1635,6 +1965,47 @@ function BudgetingTab() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Upload Dialog for Chart of Accounts */}
+      <Dialog open={uploadDialog === 'chartOfAccounts'} onOpenChange={() => setUploadDialog(null)}>
+        <DialogContent className="bg-gray-900 border-gray-700 text-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Upload className="h-5 w-5 text-blue-400" />
+              Upload Chart of Accounts
+            </DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Upload a CSV or Excel file containing your chart of accounts structure
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center">
+              <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-300 mb-2">Drag and drop your file here, or click to browse</p>
+              <p className="text-sm text-gray-500">Supports CSV, XLS, XLSX files</p>
+              <input
+                type="file"
+                accept=".csv,.xls,.xlsx"
+                onChange={(e) => handleFileUpload(e, 'chartOfAccounts')}
+                className="hidden"
+                id="chartOfAccountsUpload"
+              />
+              <label htmlFor="chartOfAccountsUpload">
+                <Button variant="outline" className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600 mt-4" asChild>
+                  <span>Choose File</span>
+                </Button>
+              </label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setUploadDialog(null)} className="border-gray-600 text-gray-300">
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+
     </div>
   )
 }
@@ -1883,21 +2254,21 @@ function EnhancedPropertiesTab({
   // Property-specific data for table
   const propertyTableData = [
     { 
-      name: "Stanford GSB", 
+      name: "01 STANFORD", 
       address: "655 Knight Way, Stanford, CA",
       staff: [
         { name: "Sarah Chen", role: "Property Manager", phone: "(650) 723-2146", email: "sarah.chen@stanford.edu" }
       ]
     },
     { 
-      name: "Sunnyvale 432", 
+      name: "02 SUNNYVALE", 
       address: "432 Sunnyvale Ave, Sunnyvale, CA",
       staff: [
         { name: "Mike Johnson", role: "Site Manager", phone: "(408) 555-0198", email: "mike.johnson@sunnyvale.com" }
       ]
     },
     { 
-      name: "Downtown Lofts", 
+      name: "03 DOWNTOWN", 
       address: "123 Market St, San Francisco, CA",
       staff: [
         { name: "Lisa Wong", role: "Building Manager", phone: "(415) 555-0142", email: "lisa.wong@dtlofts.com" }
@@ -2204,6 +2575,7 @@ function EnhancedPropertiesTab({
 }
 
 export default function PMFinancialDashboard() {
+  const router = useRouter()
   const [expandedProperty, setExpandedProperty] = useState<string | null>(null)
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false)
   const [reportDialogOpen, setReportDialogOpen] = useState(false)
@@ -2669,6 +3041,7 @@ export default function PMFinancialDashboard() {
   const [collateralFilterProperty, setCollateralFilterProperty] = useState('all');
   const [collateralFilterDocType, setCollateralFilterDocType] = useState('all');
   const [collateralFilterUploadedBy, setCollateralFilterUploadedBy] = useState('all');
+  const [collateralFilterArea, setCollateralFilterArea] = useState('all');
   const [collateralFilterDateFrom, setCollateralFilterDateFrom] = useState('');
   const [collateralFilterDateTo, setCollateralFilterDateTo] = useState('');
   const [collateralUploadDialogOpen, setCollateralUploadDialogOpen] = useState(false);
@@ -2783,6 +3156,7 @@ export default function PMFinancialDashboard() {
   const [selectedCardForPayment, setSelectedCardForPayment] = useState<any>(null);
   const [processPaymentDialogOpen, setProcessPaymentDialogOpen] = useState(false);
   const [reimbursementReviewDialogOpen, setReimbursementReviewDialogOpen] = useState(false);
+  const [addAccountDialogOpen, setAddAccountDialogOpen] = useState(false);
   
   // Mock state for bank accounts and trust accounts (to simulate updates)
   const [bankAccountsState, setBankAccountsState] = useState(bankAccounts);
@@ -3150,7 +3524,7 @@ export default function PMFinancialDashboard() {
     },
     {
       id: "stanford",
-      name: "Stanford GSB",
+      name: "01 STANFORD",
       address: "655 Knight Way, Stanford, CA",
       totalBalance: 1250.0,
       cardCount: 2,
@@ -3215,7 +3589,7 @@ export default function PMFinancialDashboard() {
     },
     {
       id: "sunnyvale",
-      name: "Sunnyvale 432",
+      name: "02 SUNNYVALE",
       address: "432 Sunnyvale Ave, Sunnyvale, CA",
       totalBalance: 2991.25,
       cardCount: 2,
@@ -3280,7 +3654,7 @@ export default function PMFinancialDashboard() {
     },
     {
       id: "downtown",
-      name: "Downtown Lofts",
+      name: "03 DOWNTOWN",
       address: "123 Market St, San Francisco, CA",
       totalBalance: 450.0,
       cardCount: 1,
@@ -3519,7 +3893,7 @@ export default function PMFinancialDashboard() {
       vendor: 'Lowe\'s', 
       amount: 89.99, 
       status: 'reconciled', 
-      jobId: 'job1', 
+      jobId: 'job2', 
       billable: false, 
       madeBy: 'Alice Johnson', 
       cardHolder: 'Alice Johnson', 
@@ -3533,12 +3907,54 @@ export default function PMFinancialDashboard() {
       vendor: 'Ace Hardware', 
       amount: 45.00, 
       status: 'pending', 
-      jobId: 'job1', 
+      jobId: 'job3', 
       billable: true, 
       madeBy: 'Alice Johnson', 
       cardHolder: 'Alice Johnson', 
       memo: 'Hardware supplies',
       receipt: 'receipt-t3.pdf',
+      expenseType: 'credit_card'
+    },
+    { 
+      id: 't4', 
+      date: '2025-01-12', 
+      vendor: 'Office Depot', 
+      amount: 67.50, 
+      status: 'reconciled', 
+      jobId: 'job4', 
+      billable: true, 
+      madeBy: 'Alice Johnson', 
+      cardHolder: 'Alice Johnson', 
+      memo: 'Office supplies for work site',
+      receipt: 'receipt-t4.pdf',
+      expenseType: 'credit_card'
+    },
+    { 
+      id: 't5', 
+      date: '2025-01-11', 
+      vendor: 'AutoZone', 
+      amount: 34.99, 
+      status: 'pending', 
+      jobId: 'job5', 
+      billable: false, 
+      madeBy: 'Alice Johnson', 
+      cardHolder: 'Alice Johnson', 
+      memo: 'Van maintenance',
+      receipt: 'receipt-t5.pdf',
+      expenseType: 'credit_card'
+    },
+    { 
+      id: 't6', 
+      date: '2025-01-10', 
+      vendor: 'Staples', 
+      amount: 23.45, 
+      status: 'reconciled', 
+      jobId: '', 
+      billable: false, 
+      madeBy: 'Alice Johnson', 
+      cardHolder: 'Alice Johnson', 
+      memo: 'General office supplies',
+      receipt: 'receipt-t6.pdf',
       expenseType: 'credit_card'
     },
   ];
@@ -3832,8 +4248,8 @@ export default function PMFinancialDashboard() {
   // Sample properties for dropdown
   const propertyOptions = [
     { id: 'general', name: 'General' },
-    { id: 'prop1', name: 'Stanford GSB' },
-    { id: 'prop2', name: 'Sunnyvale 432' },
+    { id: 'prop1', name: '01 STANFORD' },
+    { id: 'prop2', name: '02 SUNNYVALE' },
   ]
 
   type JobType = typeof jobsList[0];
@@ -3873,7 +4289,7 @@ export default function PMFinancialDashboard() {
     setNewNote("");
   }
 
-  const router = useRouter();
+
 
   // Helper: get jobs by status
   const openJobs = jobs.filter(j => j.techStatus !== 'Finished');
@@ -4176,7 +4592,7 @@ export default function PMFinancialDashboard() {
   };
 
   // Helper to filter expenses by role (for technicians, only show their own expenses)
-  const filterExpensesByRole = (expenses: Transaction[]) => {
+  const filterExpensesByRole = useCallback((expenses: Transaction[]) => {
     return expenses.filter(txn => {
       if (role === 'technician') {
         // For technicians, only show expenses from their own cards
@@ -4190,7 +4606,7 @@ export default function PMFinancialDashboard() {
       }
       return true;
     });
-  };
+  }, [role, technicianName]);
 
   // Export to CSV (browser-based, no dependency)
   function exportTransactionsToCSV() {
@@ -4314,7 +4730,7 @@ export default function PMFinancialDashboard() {
   const [transactionDetailsOpen, setTransactionDetailsOpen] = useState(false);
 
   // Get current user name based on role
-  const getCurrentUserName = () => {
+  const getCurrentUserName = useCallback(() => {
     if (role === 'technician') {
       return technicianName;
     } else if (role === 'pm') {
@@ -4323,10 +4739,10 @@ export default function PMFinancialDashboard() {
       return 'Central Office'; // Central Office can see all expenses
     }
     return '';
-  };
+  }, [role, technicianName]);
 
   // Helper to filter work orders by role (for technicians, only show their assigned work orders)
-  const filterWorkOrdersByRole = (workOrders: typeof jobs) => {
+  const filterWorkOrdersByRole = useCallback((workOrders: typeof jobs) => {
     if (role === 'technician') {
       // For technicians, only show work orders assigned to them
       return workOrders.filter(job => job.technician === technicianName);
@@ -4337,15 +4753,15 @@ export default function PMFinancialDashboard() {
       // For Central Office, show all work orders
       return workOrders;
     }
-  };
+  }, [role, technicianName]);
 
-  // Get technician-specific data for Dashboard
-  const technicianWorkOrders = filterWorkOrdersByRole(jobs);
-  const technicianExpenses = filterExpensesByRole([...transactions, ...technicianTransactions]);
+  // Memoize expensive role-based computations
+  const technicianWorkOrders = useMemo(() => filterWorkOrdersByRole(jobs), [filterWorkOrdersByRole, jobs]);
+  const technicianExpenses = useMemo(() => filterExpensesByRole([...transactions, ...technicianTransactions]), [filterExpensesByRole, transactions, technicianTransactions]);
   
-  // Calculate technician-specific KPIs
-  const technicianOpenJobs = technicianWorkOrders.filter(job => job.statusValue === 'open');
-  const technicianInProgressJobs = technicianWorkOrders.filter(job => job.techStatus === 'In Progress');
+  // Calculate technician-specific KPIs with memoization
+  const technicianOpenJobs = useMemo(() => technicianWorkOrders.filter(job => job.statusValue === 'open'), [technicianWorkOrders]);
+  const technicianInProgressJobs = useMemo(() => technicianWorkOrders.filter(job => job.techStatus === 'In Progress'), [technicianWorkOrders]);
   const technicianFinishedJobs = technicianWorkOrders.filter(job => job.techStatus === 'Finished');
   const technicianOverdueJobs = technicianWorkOrders.filter(job => {
     const dueDate = new Date(job.requested);
@@ -5518,6 +5934,14 @@ Central Office`,
         return false;
       }
       
+      // Area filter
+      if (collateralFilterArea !== 'all') {
+        const property = propertyOptions.find(p => p.id === doc.propertyId);
+        if (!property || property.area !== collateralFilterArea) {
+          return false;
+        }
+      }
+      
       // Document type filter
       if (collateralFilterDocType !== 'all' && doc.documentType !== collateralFilterDocType) {
         return false;
@@ -5542,6 +5966,7 @@ Central Office`,
     collateralDocs,
     collateralDebouncedSearchQuery,
     collateralFilterProperty,
+    collateralFilterArea,
     collateralFilterDocType,
     collateralFilterUploadedBy,
     collateralFilterDateFrom,
@@ -6660,73 +7085,81 @@ Central Office`,
                         size="sm"
                       >
                         <AlertTriangle className="h-4 w-4 mr-2" />
-                        View All (5)
+                        View All (6)
                       </Button>
                     </div>
 
-                    {/* Critical Alert */}
-                    <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4 mb-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <AlertTriangle className="h-5 w-5 text-red-400" />
-                        <h5 className="text-red-300 font-semibold">Critical: 5 Variance Comments Due</h5>
+                    {/* Slimmed Todo-Style Variance List */}
+                    <div className="bg-gray-800 border-gray-700 rounded-lg p-4">
+                      <div className="space-y-3">
+                        {[
+                          {
+                            id: 1,
+                            account: '7215 - Plumbing Repairs',
+                            property: 'ap172',
+                            variance: '+$8,750 (+58.3%)',
+                            priority: 'high'
+                          },
+                          {
+                            id: 2,
+                            account: '6125 - Leasing Commissions',
+                            property: 'ap172',
+                            variance: '+$7,280 (+12.6%)',
+                            priority: 'high'
+                          },
+                          {
+                            id: 3,
+                            account: '7420 - Electrical Systems',
+                            property: 'mb401',
+                            variance: '+$28,780 (+22.5%)',
+                            priority: 'high'
+                          },
+                          {
+                            id: 4,
+                            account: '8115 - HVAC Equipment Financing',
+                            property: 'ap172',
+                            variance: '+$26,000 (+29.5%)',
+                            priority: 'medium'
+                          },
+                          {
+                            id: 5,
+                            account: '4125 - Parking Revenue',
+                            property: 'ap172',
+                            variance: '+$28,800 (+25.7%)',
+                            priority: 'low'
+                          }
+                        ].map((item) => (
+                          <div 
+                            key={item.id}
+                            onClick={() => setActiveTab('variance-comments')}
+                            className="flex items-center justify-between p-3 bg-gray-900 rounded-lg hover:bg-gray-700 cursor-pointer transition-colors group"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className={`w-2 h-2 rounded-full ${
+                                item.priority === 'high' ? 'bg-red-400' : 
+                                item.priority === 'medium' ? 'bg-orange-400' : 'bg-yellow-400'
+                              }`} />
+                              <div>
+                                <div className="text-blue-300 text-sm font-medium group-hover:text-blue-200">
+                                  {item.account}
+                                </div>
+                                <div className="text-gray-400 text-xs">
+                                  {item.property} • Variance: <span className="text-red-300 font-medium">{item.variance}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <ChevronRight className="h-4 w-4 text-gray-500 group-hover:text-white" />
+                          </div>
+                        ))}
+                        
+                        {/* Show more link */}
+                        <button
+                          onClick={() => setActiveTab('variance-comments')}
+                          className="w-full text-center py-2 text-red-300 hover:text-red-200 text-sm font-medium"
+                        >
+                          + 1 more item • View All Details →
+                        </button>
                       </div>
-                      <p className="text-red-200 text-sm">
-                        Budget overages &gt;$5K or &gt;5% require immediate variance comments. 
-                        <strong> Chris is expecting these by EOD.</strong>
-                      </p>
-                    </div>
-
-                    {/* Top 3 Urgent Variance Items */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {[
-                        {
-                          property: 'Stanford GSB',
-                          glCode: '7200 - HVAC Repairs',
-                          variance: '+$8,750 (+58.3%)',
-                          urgency: 'Due Now',
-                          reason: 'Emergency system replacement'
-                        },
-                        {
-                          property: 'Stanford GSB', 
-                          glCode: '6100 - Tree Maintenance',
-                          variance: '+$5,200 (+65%)',
-                          urgency: 'Due Now',
-                          reason: 'Storm damage removal'
-                        },
-                        {
-                          property: 'Mission Bay',
-                          glCode: '7300 - Legal Fees', 
-                          variance: '+$6,500 (+54.2%)',
-                          urgency: 'Due Now',
-                          reason: 'Tenant lease dispute'
-                        }
-                      ].map((item, idx) => (
-                        <Card key={idx} className="bg-gray-800 border-red-500/30">
-                          <CardContent className="p-4">
-                            <div className="text-orange-300 text-xs mb-1 font-medium">{item.property}</div>
-                            <div className="text-blue-300 text-sm font-medium mb-2">{item.glCode}</div>
-                            <div className="text-red-300 font-bold text-lg mb-1">{item.variance}</div>
-                            <div className="text-orange-200 text-xs mb-2">{item.reason}</div>
-                            <Badge className="bg-red-600 text-red-100 text-xs">
-                              <AlertTriangle className="h-3 w-3 mr-1" />
-                              {item.urgency}
-                            </Badge>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-
-                    <div className="mt-4 text-center">
-                      <div className="text-xs text-red-300 mb-2">
-                        💡 <strong>Pro Tip:</strong> Use AI suggestions to write detailed, specific variance comments that Chris will approve.
-                      </div>
-                      <Button
-                        onClick={() => setActiveTab('variance-comments')}
-                        className="bg-red-600 hover:bg-red-700 text-white"
-                      >
-                        <Edit className="h-4 w-4 mr-2" />
-                        Submit Variance Comments
-                      </Button>
                     </div>
                   </div>
                 )}
@@ -8122,16 +8555,36 @@ Central Office`,
                                         {paymentType === 'one-time' ? (
                                           // One-time payment UI
                                           <div className="flex gap-2">
-                                            <Select value={selectedBankAccount} onValueChange={setSelectedBankAccount}>
-                                              <SelectTrigger className="w-48 bg-gray-800 border-gray-600 text-white">
+                                            <Select value={selectedBankAccount} onValueChange={(value) => {
+                                              if (value === 'add-new-account') {
+                                                setAddAccountDialogOpen(true);
+                                              } else {
+                                                setSelectedBankAccount(value);
+                                              }
+                                            }}>
+                                              <SelectTrigger className="w-64 bg-gray-800 border-gray-600 text-white">
                                                 <SelectValue placeholder="Select payment account" />
                                               </SelectTrigger>
                                               <SelectContent className="bg-gray-800 border-gray-600 z-50">
-                                                {bankAccountsState.filter(acc => acc.status === 'linked').map(account => (
-                                                  <SelectItem key={account.id} value={account.id} className="text-white">
-                                                    {account.name}
-                                                  </SelectItem>
-                                                ))}
+                                                <SelectGroup>
+                                                  <SelectLabel className="text-blue-400 font-semibold">PM Accounts</SelectLabel>
+                                                  {bankAccountsState.filter(acc => acc.status === 'linked' && acc.accountType === 'pm').map(account => (
+                                                    <SelectItem key={account.id} value={account.id} className="text-white pl-6">
+                                                      {account.name} (${account.balance?.toLocaleString() || '0'})
+                                                    </SelectItem>
+                                                  ))}
+                                                </SelectGroup>
+                                                <SelectGroup>
+                                                  <SelectLabel className="text-green-400 font-semibold">Owner Accounts</SelectLabel>
+                                                  {bankAccountsState.filter(acc => acc.status === 'linked' && acc.accountType === 'owner').map(account => (
+                                                    <SelectItem key={account.id} value={account.id} className="text-white pl-6">
+                                                      {account.name} (${account.balance?.toLocaleString() || '0'})
+                                                    </SelectItem>
+                                                  ))}
+                                                </SelectGroup>
+                                                <SelectItem value="add-new-account" className="text-blue-400 font-medium border-t border-gray-600 mt-1 pt-2">
+                                                  + Add New Account
+                                                </SelectItem>
                                               </SelectContent>
                                             </Select>
                                             <Button 
@@ -8325,6 +8778,7 @@ Central Office`,
                                             <th className="text-left p-3 text-gray-300">Vendor</th>
                                             <th className="text-left p-3 text-gray-300">Description</th>
                                             <th className="text-left p-3 text-gray-300">Property</th>
+                                            <th className="text-left p-3 text-gray-300">GL Code</th>
                                             <th className="text-left p-3 text-gray-300">Amount</th>
                                             <th className="text-left p-3 text-gray-300">Receipt</th>
                                           </tr>
@@ -8350,6 +8804,10 @@ Central Office`,
                                               <td className="p-3 text-white">{expense.vendor}</td>
                                               <td className="p-3 text-gray-300">{expense.description}</td>
                                               <td className="p-3 text-gray-300">{expense.propertyName}</td>
+                                              <td className="p-3">
+                                                <div className="text-blue-300">505.3</div>
+                                                <div className="text-xs text-blue-200">Maintenance Supplies</div>
+                                              </td>
                                               <td className="p-3 text-white">${expense.amount.toFixed(2)}</td>
                                               <td className="p-3">
                                                 {expense.receipt ? (
@@ -8483,6 +8941,92 @@ Central Office`,
                     </DialogContent>
                   </Dialog>
 
+                  {/* Add Account Dialog */}
+                  <Dialog open={addAccountDialogOpen} onOpenChange={setAddAccountDialogOpen}>
+                    <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-md">
+                      <DialogHeader>
+                        <DialogTitle>Add New Payment Account</DialogTitle>
+                        <DialogDescription>
+                          Add a new bank account for processing payments
+                        </DialogDescription>
+                      </DialogHeader>
+                      
+                      <div className="space-y-4 py-4">
+                        <div>
+                          <Label className="text-sm text-gray-400 mb-2 block">Account Name</Label>
+                          <Input 
+                            placeholder="e.g., Wells Fargo Business Checking"
+                            className="bg-gray-800 border-gray-600 text-white"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label className="text-sm text-gray-400 mb-2 block">Account Type</Label>
+                          <Select defaultValue="pm">
+                            <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-gray-800 border-gray-600">
+                              <SelectItem value="pm" className="text-white">PM Account</SelectItem>
+                              <SelectItem value="owner" className="text-white">Owner Account</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div>
+                          <Label className="text-sm text-gray-400 mb-2 block">Bank Type</Label>
+                          <Select defaultValue="checking">
+                            <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-gray-800 border-gray-600">
+                              <SelectItem value="checking" className="text-white">Checking</SelectItem>
+                              <SelectItem value="savings" className="text-white">Savings</SelectItem>
+                              <SelectItem value="trust" className="text-white">Trust Account</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div>
+                          <Label className="text-sm text-gray-400 mb-2 block">Account Number</Label>
+                          <Input 
+                            placeholder="Account number"
+                            className="bg-gray-800 border-gray-600 text-white"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label className="text-sm text-gray-400 mb-2 block">Routing Number</Label>
+                          <Input 
+                            placeholder="Routing number"
+                            className="bg-gray-800 border-gray-600 text-white"
+                          />
+                        </div>
+                        
+                        <div className="mt-4 p-3 bg-blue-900/20 border border-blue-500/30 rounded">
+                          <div className="text-sm text-blue-300">
+                            💡 New accounts will need verification before they can be used for payments
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setAddAccountDialogOpen(false)}>
+                          Cancel
+                        </Button>
+                        <Button 
+                          onClick={() => {
+                            // Add logic to create new account here
+                            setAddAccountDialogOpen(false);
+                          }}
+                          className="bg-blue-600 hover:bg-blue-700"
+                        >
+                          Add Account
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+
                   {/* Expense Details Dialog */}
                   <Dialog open={expenseDetailsDialogOpen} onOpenChange={setExpenseDetailsDialogOpen}>
                     <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-2xl">
@@ -8495,7 +9039,27 @@ Central Office`,
                       
                       {selectedExpenseForView && (
                         <div className="space-y-4">
-                          <div className="grid grid-cols-2 gap-4">
+                          {/* GL Code and Property Info Header */}
+                          <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="text-lg font-semibold text-white">
+                                  {selectedExpenseForView.glCode} - {selectedExpenseForView.description}
+                                </div>
+                                <div className="text-blue-300 text-sm">
+                                  Property: {selectedExpenseForView.property}
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-sm text-gray-400">Priority</div>
+                                <Badge className={selectedExpenseForView.expenseDetails?.priority === 'High' ? 'bg-red-600' : 'bg-gray-600'}>
+                                  {selectedExpenseForView.expenseDetails?.priority || 'Normal'}
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <Card className="bg-gray-800 border-gray-700">
                               <CardContent className="p-4">
                                 <div className="text-sm text-gray-400">Invoice Details</div>
@@ -8519,26 +9083,97 @@ Central Office`,
                                 </Badge>
                               </CardContent>
                             </Card>
+
+                            <Card className="bg-gray-800 border-gray-700">
+                              <CardContent className="p-4">
+                                <div className="text-sm text-gray-400">Budget Analysis</div>
+                                <div className="space-y-2">
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-400 text-xs">PTD Actual:</span>
+                                    <span className="text-white text-xs">${selectedExpenseForView.ptdActual?.toLocaleString()}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-400 text-xs">PTD Budget:</span>
+                                    <span className="text-white text-xs">${selectedExpenseForView.ptdBudget?.toLocaleString()}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-400 text-xs">Variance:</span>
+                                    <span className={`text-xs ${
+                                      (selectedExpenseForView.ptdActual - selectedExpenseForView.ptdBudget) >= 0 ? 'text-red-400' : 'text-green-400'
+                                    }`}>
+                                      ${Math.abs(selectedExpenseForView.ptdActual - selectedExpenseForView.ptdBudget).toLocaleString()}
+                                      {(selectedExpenseForView.ptdActual - selectedExpenseForView.ptdBudget) >= 0 ? ' over' : ' under'}
+                                    </span>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          </div>
+
+                          {/* Approval Details */}
+                          <div className="bg-gray-800 p-4 rounded-lg">
+                            <div className="text-sm text-gray-400 mb-2">Approval Details</div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <div className="text-xs text-gray-400">Approved by:</div>
+                                <div className="text-white">{selectedExpenseForView.expenseDetails?.approvedBy}</div>
+                              </div>
+                              <div>
+                                <div className="text-xs text-gray-400">Approved on:</div>
+                                <div className="text-white">{selectedExpenseForView.expenseDetails?.approvedDate}</div>
+                              </div>
+                            </div>
                           </div>
                           
                           <div className="bg-gray-800 p-4 rounded-lg">
-                            <div className="text-sm text-gray-400 mb-2">Description</div>
-                            <div className="text-white">{selectedExpenseForView.description}</div>
+                            <div className="text-sm text-gray-400 mb-2">Description & Notes</div>
+                            <div className="text-white mb-3">{selectedExpenseForView.description}</div>
                             
                             {selectedExpenseForView.expenseDetails?.notes && (
                               <>
-                                <div className="text-sm text-gray-400 mt-3 mb-2">Notes</div>
-                                <div className="text-gray-300">{selectedExpenseForView.expenseDetails.notes}</div>
+                                <div className="text-sm text-gray-400 mb-2">PM Notes</div>
+                                <div className="text-gray-300 text-sm bg-gray-700 p-3 rounded">{selectedExpenseForView.expenseDetails.notes}</div>
                               </>
                             )}
                           </div>
+
+                          {/* Attachments */}
+                          {selectedExpenseForView.expenseDetails?.attachments && (
+                            <div className="bg-gray-800 p-4 rounded-lg">
+                              <div className="text-sm text-gray-400 mb-2">Attachments</div>
+                              <div className="space-y-1">
+                                {selectedExpenseForView.expenseDetails.attachments.map((attachment: string, idx: number) => (
+                                  <div key={idx} className="flex items-center gap-2 text-blue-400 text-sm hover:text-blue-300 cursor-pointer">
+                                    <Receipt className="h-3 w-3" />
+                                    {attachment}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                           
                           <div className="flex gap-2">
-                            <Button variant="outline" className="text-blue-400 border-blue-600 hover:bg-blue-600 hover:text-white">
+                            <Button 
+                              variant="outline" 
+                              className="text-blue-400 border-blue-600 hover:bg-blue-600 hover:text-white"
+                              onClick={() => {
+                                // Open receipt in new tab
+                                window.open(selectedExpenseForView.receiptUrl, '_blank');
+                              }}
+                            >
                               <Receipt className="h-4 w-4 mr-2" />
                               View Receipt
                             </Button>
-                            <Button variant="outline" className="text-green-400 border-green-600 hover:bg-green-600 hover:text-white">
+                            <Button 
+                              variant="outline" 
+                              className="text-green-400 border-green-600 hover:bg-green-600 hover:text-white"
+                              onClick={() => {
+                                // Navigate to work order page
+                                if (selectedExpenseForView.workOrderId) {
+                                  router.push(`/workorders/${selectedExpenseForView.workOrderId}?role=centralOffice`);
+                                }
+                              }}
+                            >
                               <ExternalLink className="h-4 w-4 mr-2" />
                               View Work Order
                             </Button>
@@ -8922,6 +9557,7 @@ Central Office`,
                           <th className="text-left py-3 px-4 font-semibold text-white">Made By</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Property</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Work Order</th>
+                          <th className="text-left py-3 px-4 font-semibold text-white">GL Code</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Billable</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Memo</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Documents</th>
@@ -9003,8 +9639,21 @@ Central Office`,
                                       </SelectContent>
                                     </Select>
                                   ) : (
-                                    <span className="text-gray-300">{job ? job.description : 'Not Assigned'}</span>
+                                    job ? (
+                                      <button
+                                        className="text-blue-400 hover:text-blue-300 underline cursor-pointer"
+                                        onClick={() => router.push(`/workorders/${job.id}?role=${role}&returnTo=wallet`)}
+                                      >
+                                        {job.description}
+                                      </button>
+                                    ) : (
+                                      <span className="text-gray-300">Not Assigned</span>
+                                    )
                                   )}
+                                </td>
+                                <td className="py-3 px-4">
+                                  <div className="text-blue-300">522.1</div>
+                                  <div className="text-xs text-blue-200">HVAC Repairs</div>
                                 </td>
                                 <td className="py-3 px-4">
                                   {isEditing ? (
@@ -9245,6 +9894,7 @@ Central Office`,
                           <th className="text-left py-3 px-4 font-semibold text-white">Made By</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Property</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Work Order</th>
+                          <th className="text-left py-3 px-4 font-semibold text-white">GL Code</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Billable</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Memo</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Documents</th>
@@ -9328,8 +9978,26 @@ Central Office`,
                                       </SelectContent>
                                     </Select>
                                   ) : (
-                                    assignment.job ? (jobs.find(j => j.id === assignment.job)?.description || assignment.job) : (job ? job.description : 'Not Assigned')
+                                    assignment.job ? (
+                                      <button
+                                        className="text-blue-400 hover:text-blue-300 underline cursor-pointer"
+                                        onClick={() => window.location.href = `/workorders/${assignment.job}?role=${role}&returnTo=expenses`}
+                                      >
+                                        {jobs.find(j => j.id === assignment.job)?.description || assignment.job}
+                                      </button>
+                                    ) : (job ? (
+                                      <button
+                                        className="text-blue-400 hover:text-blue-300 underline cursor-pointer"
+                                        onClick={() => window.location.href = `/workorders/${job.id}?role=${role}&returnTo=expenses`}
+                                      >
+                                        {job.description}
+                                      </button>
+                                    ) : 'Not Assigned')
                                   )}
+                                </td>
+                                <td className="py-3 px-4">
+                                  <div className="text-blue-300">522.1</div>
+                                  <div className="text-xs text-blue-200">HVAC Repairs</div>
                                 </td>
                                 <td className="py-3 px-4">
                                   {isEditing ? (
@@ -9583,6 +10251,7 @@ Central Office`,
                           <th className="text-left py-3 px-4 font-semibold text-white">Made By</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Property</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Work Order</th>
+                          <th className="text-left py-3 px-4 font-semibold text-white">GL Code</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Billable</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Memo</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Receipt</th>
@@ -9611,7 +10280,22 @@ Central Office`,
                                 <td className="py-3 px-4 text-gray-300">${txn.amount.toFixed(2)}</td>
                                 <td className="py-3 px-4 text-gray-300">{txn.madeBy}</td>
                                 <td className="py-3 px-4 text-gray-300">{property ? property.name : 'Not Assigned'}</td>
-                                <td className="py-3 px-4 text-gray-300">{job ? job.description : 'Not Assigned'}</td>
+                                <td className="py-3 px-4">
+                                  {job ? (
+                                    <button
+                                      className="text-blue-400 hover:text-blue-300 underline cursor-pointer"
+                                      onClick={() => router.push(`/workorders/${job.id}?role=${role}&returnTo=technicianExpenses`)}
+                                    >
+                                      {job.description}
+                                    </button>
+                                  ) : (
+                                    <span className="text-gray-300">Not Assigned</span>
+                                  )}
+                                </td>
+                                <td className="py-3 px-4">
+                                  <div className="text-blue-300">505.3</div>
+                                  <div className="text-xs text-blue-200">Maintenance Supplies</div>
+                                </td>
                                 <td className="py-3 px-4">
                                   <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold ${txn.billable ? 'bg-green-700 text-green-100' : 'bg-gray-700 text-gray-200'}`}>
                                     {txn.billable ? 'Yes' : 'No'}
@@ -9655,6 +10339,7 @@ Central Office`,
                           <th className="text-left py-3 px-4 font-semibold text-white">Made By</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Property</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Work Order</th>
+                          <th className="text-left py-3 px-4 font-semibold text-white">GL Code</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Billable</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Memo</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Receipt</th>
@@ -9724,8 +10409,21 @@ Central Office`,
                                       </SelectContent>
                                     </Select>
                                   ) : (
-                                    <span className="text-gray-300">{job ? job.description : 'Not Assigned'}</span>
+                                    job ? (
+                                      <button
+                                        className="text-blue-400 hover:text-blue-300 underline cursor-pointer"
+                                        onClick={() => router.push(`/workorders/${job.id}?role=${role}&returnTo=expenses`)}
+                                      >
+                                        {job.description}
+                                      </button>
+                                    ) : (
+                                      <span className="text-gray-300">Not Assigned</span>
+                                    )
                                   )}
+                                </td>
+                                <td className="py-3 px-4">
+                                  <div className="text-blue-300">522.1</div>
+                                  <div className="text-xs text-blue-200">HVAC Repairs</div>
                                 </td>
                                 <td className="py-3 px-4">
                                   {isEditing ? (
@@ -9916,6 +10614,7 @@ Central Office`,
                                 <th className="text-left py-3 px-4 font-semibold text-white">Made By</th>
                                 <th className="text-left py-3 px-4 font-semibold text-white">Property</th>
                                 <th className="text-left py-3 px-4 font-semibold text-white">Work Order</th>
+                                <th className="text-left py-3 px-4 font-semibold text-white">GL Code</th>
                                 <th className="text-left py-3 px-4 font-semibold text-white">Billable</th>
                                 <th className="text-left py-3 px-4 font-semibold text-white">Status</th>
                                 <th className="text-left py-3 px-4 font-semibold text-white">AI Flag</th>
@@ -9939,7 +10638,22 @@ Central Office`,
                                     <td className="py-3 px-4 text-gray-300">${txn.amount.toFixed(2)}</td>
                                     <td className="py-3 px-4 text-gray-300">{txn.madeBy}</td>
                                     <td className="py-3 px-4 text-gray-300">{property ? property.name : 'Not Assigned'}</td>
-                                    <td className="py-3 px-4 text-gray-300">{job ? job.description : 'Not Assigned'}</td>
+                                    <td className="py-3 px-4">
+                                      {job ? (
+                                        <button
+                                          className="text-blue-400 hover:text-blue-300 underline cursor-pointer"
+                                          onClick={() => router.push(`/workorders/${job.id}?role=${role}&returnTo=transactions`)}
+                                        >
+                                          {job.description}
+                                        </button>
+                                      ) : (
+                                        <span className="text-gray-300">Not Assigned</span>
+                                      )}
+                                    </td>
+                                    <td className="py-3 px-4">
+                                      <div className="text-blue-300">522.1</div>
+                                      <div className="text-xs text-blue-200">HVAC Repairs</div>
+                                    </td>
                                     <td className="py-3 px-4">
                                       <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold ${
                                         txn.billable ? 'bg-green-700 text-green-100' : 'bg-gray-700 text-gray-200'
@@ -10108,6 +10822,7 @@ Central Office`,
                           <th className="text-left py-3 px-4 font-semibold text-white">Made By</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Property</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Work Order</th>
+                          <th className="text-left py-3 px-4 font-semibold text-white">GL Code</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Billable</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Status</th>
                           <th className="text-left py-3 px-4 font-semibold text-white">Details</th>
@@ -10127,7 +10842,26 @@ Central Office`,
                               <td className="py-3 px-4 text-gray-300">${txn.amount.toFixed(2)}</td>
                               <td className="py-3 px-4 text-gray-300">{txn.madeBy}</td>
                               <td className="py-3 px-4 text-gray-300">{assignment.property || (property ? property.name : 'Not Assigned')}</td>
-                              <td className="py-3 px-4 text-gray-300">{assignment.job ? (jobs.find(j => j.id === assignment.job)?.description || assignment.job) : (job ? job.description : 'Not Assigned')}</td>
+                              <td className="py-3 px-4">
+                                {assignment.job || job ? (
+                                  <button
+                                    className="text-blue-400 hover:text-blue-300 underline cursor-pointer"
+                                    onClick={() => {
+                                      const workOrderId = assignment.job || txn.jobId;
+                                      if (workOrderId) {
+                                        router.push(`/workorders/${workOrderId}?role=${role}`);
+                                      }
+                                    }}
+                                  >
+                                    {assignment.job ? (jobs.find(j => j.id === assignment.job)?.description || assignment.job) : (job ? job.description : 'Not Assigned')}
+                                  </button>
+                                ) : (
+                                  <span className="text-gray-300">Not Assigned</span>
+                                )}
+                              </td>
+                              <td className="py-3 px-4 text-blue-300">
+                                {txn.billable ? '7200 - Repairs & Maintenance' : '6100 - Office Expenses'}
+                              </td>
                               <td className="py-3 px-4">
                                 <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold ${
                                   txn.billable ? 'bg-green-700 text-green-100' : 'bg-gray-700 text-gray-200'
@@ -11005,6 +11739,22 @@ Central Office`,
                           <SelectItem value="all">All Properties</SelectItem>
                           {propertyOptions.map(property => (
                             <SelectItem key={property.id} value={property.id}>{property.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-gray-300">Area</Label>
+                      <Select value={collateralFilterArea} onValueChange={setCollateralFilterArea}>
+                        <SelectTrigger className="bg-gray-800 border-gray-600 text-white w-40">
+                          <SelectValue>
+                            {collateralFilterArea === 'all' ? 'All Areas' : 
+                             areaOptions.find(a => a.id === collateralFilterArea)?.name || 'All Areas'}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent className="bg-gray-900 border-gray-700 text-white">
+                          {areaOptions.map(area => (
+                            <SelectItem key={area.id} value={area.id}>{area.name}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -12082,172 +12832,287 @@ Central Office`,
                     <h4 className="text-red-300 font-semibold">Critical: Variance Comments Required</h4>
                   </div>
                   <p className="text-red-200 text-sm mb-3">
-                    You have <strong>5 pending variance comments</strong> that require immediate attention. 
-                    These represent budget overages that exceed established thresholds and need owner review.
+                    You have <strong>6 variance items</strong> that require immediate attention. 
+                    These represent budget variances &gt;$5K or &gt;5% that exceed established thresholds and need owner review.
                   </p>
-                  <div className="text-xs text-red-300">
-                    ⚠️ Chris is expecting these by EOD. Comments must be specific and include corrective action plans.
-                  </div>
+
                 </div>
 
-                {/* Variance Comments Table */}
-                <Card className="bg-gray-800 border-gray-700">
+                {/* Due Comments Table */}
+                <Card className="bg-gray-800 border-gray-700 mb-6">
                   <CardHeader>
                     <CardTitle className="text-white flex items-center gap-2">
                       <Calculator className="h-5 w-5" />
-                      Budget Variance Items Requiring Comments
+                      Due Comments - Budget Variance Items Requiring Comments
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="overflow-x-auto">
-                      <table className="min-w-full">
+                      <table className="min-w-full text-xs">
                         <thead className="border-b border-gray-600">
                           <tr>
-                            <th className="text-left py-3 px-4 text-gray-400 font-medium">Property</th>
-                            <th className="text-left py-3 px-4 text-gray-400 font-medium">GL Code & Category</th>
-                            <th className="text-left py-3 px-4 text-gray-400 font-medium">Budget vs Actual</th>
-                            <th className="text-left py-3 px-4 text-gray-400 font-medium">Variance</th>
-                            <th className="text-left py-3 px-4 text-gray-400 font-medium">Status</th>
-                            <th className="text-left py-3 px-4 text-gray-400 font-medium">AI Suggestion</th>
-                            <th className="text-left py-3 px-4 text-gray-400 font-medium">Action</th>
+                            <th className="text-left py-2 px-2 text-gray-400 font-medium">Account</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">PTD Actual</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">PTD Budget</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">Variance</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">% Var</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">YTD Actual</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">YTD Budget</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">Variance</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">% Var</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">Annual</th>
+                            <th className="text-left py-2 px-2 text-gray-400 font-medium">Status</th>
+                            <th className="text-left py-2 px-2 text-gray-400 font-medium">AI Suggestion</th>
+                            <th className="text-left py-2 px-2 text-gray-400 font-medium">Action</th>
                           </tr>
                         </thead>
                         <tbody>
                           {(() => {
-                            // Mock variance items requiring comments
+                            // Mock variance items requiring comments - GL Report Format
                             const varianceItems = [
                               {
                                 id: 1,
                                 property: 'Stanford GSB',
+                                propertyCode: 'ap172',
                                 glCode: '7200',
-                                glName: 'Repairs & Maintenance',
-                                subGL: '7210 - HVAC Repairs',
-                                budgetAmount: 15000,
-                                actualAmount: 23750,
-                                varianceAmount: 8750,
-                                variancePercent: 58.3,
-                                reason: 'Emergency HVAC system replacement',
+                                glName: 'Total Repairs and Maintenance',
+                                subGL: '7215 - Plumbing Repairs',
+                                ptdActual: 23750,
+                                ptdBudget: 15000,
+                                ptdVariance: 8750,
+                                ptdVariancePercent: 58.3,
+                                ytdActual: 89420,
+                                ytdBudget: 75000,
+                                ytdVariance: 14420,
+                                ytdVariancePercent: 19.2,
+                                annual: 300000,
+                                reason: 'Emergency plumbing system replacement - quarterly overage',
                                 hasComment: false,
-                                aiSuggestion: 'Suggest explaining emergency nature of HVAC failure, age of equipment (15+ years), and preventive maintenance schedule going forward.',
+                                aiSuggestion: 'PTD overage due to emergency plumbing failure. Suggest explaining emergency nature, age of pipes (20+ years), and preventive maintenance schedule.',
                                 urgency: 'high'
                               },
                               {
                                 id: 2,
-                                property: 'Stanford GSB',
+                                property: 'Stanford GSB', 
+                                propertyCode: 'ap172',
                                 glCode: '6100',
-                                glName: 'Landscaping & Grounds',
-                                subGL: '6110 - Tree Maintenance',
-                                budgetAmount: 8000,
-                                actualAmount: 13200,
-                                variancePercent: 65.0,
-                                varianceAmount: 5200,
-                                reason: 'Storm damage tree removal',
+                                glName: 'Total Advertising and Marketing',
+                                subGL: '6125 - Leasing Commissions',
+                                ptdActual: 18076,
+                                ptdBudget: 20492,
+                                ptdVariance: -2416,
+                                ptdVariancePercent: -11.8,
+                                ytdActual: 65280,
+                                ytdBudget: 58000,
+                                ytdVariance: 7280,
+                                ytdVariancePercent: 12.6,
+                                annual: 232000,
+                                reason: 'Higher leasing commission rates for Q4 renewals',
                                 hasComment: false,
-                                aiSuggestion: 'Reference storm date, insurance claim status, and emergency safety requirements for tree removal.',
+                                aiSuggestion: 'YTD variance over 5% threshold. Detail commission structure changes and impact on future lease deals.',
                                 urgency: 'high'
                               },
                               {
                                 id: 3,
                                 property: 'Mission Bay',
-                                glCode: '5200',
-                                glName: 'Security Services',
-                                subGL: '5210 - Security Guards',
-                                budgetAmount: 24000,
-                                actualAmount: 26800,
-                                variancePercent: 11.7,
-                                varianceAmount: 2800,
-                                reason: 'Additional security for tenant events',
+                                propertyCode: 'mb401',
+                                glCode: '5200', 
+                                glName: 'Total Turnover',
+                                subGL: '5235 - Kitchen Renovations',
+                                ptdActual: 17213,
+                                ptdBudget: 31379,
+                                ptdVariance: -14166,
+                                ptdVariancePercent: -45.1,
+                                ytdActual: 78945,
+                                ytdBudget: 125000,
+                                ytdVariance: -46055,
+                                ytdVariancePercent: -36.8,
+                                annual: 500000,
+                                reason: 'Delayed kitchen renovation projects',
                                 hasComment: true,
-                                comment: 'Increased security coverage for high-profile tenant events and extended hours per security contract amendment.',
-                                aiSuggestion: 'Good explanation. Consider adding tenant reimbursement details if applicable.',
+                                comment: 'Kitchen renovation projects delayed due to permit approval process and appliance supply chain issues. Projects rescheduled for Q1 next year.',
+                                aiSuggestion: 'Good explanation. Consider adding timeline for delayed projects and budget carryover plan.',
                                 urgency: 'medium'
                               },
                               {
                                 id: 4,
                                 property: 'Mission Bay',
-                                glCode: '7300',
-                                glName: 'Professional Services',
-                                subGL: '7310 - Legal Fees',
-                                budgetAmount: 12000,
-                                actualAmount: 18500,
-                                variancePercent: 54.2,
-                                varianceAmount: 6500,
-                                reason: 'Tenant lease dispute resolution',
+                                propertyCode: 'mb401',
+                                glCode: '7400',
+                                glName: 'Operating Expenses before Replacements', 
+                                subGL: '7420 - Electrical Systems',
+                                ptdActual: 45823,
+                                ptdBudget: 32000,
+                                ptdVariance: 13823,
+                                ptdVariancePercent: 43.2,
+                                ytdActual: 156780,
+                                ytdBudget: 128000,
+                                ytdVariance: 28780,
+                                ytdVariancePercent: 22.5,
+                                annual: 512000,
+                                reason: 'Increased electrical system maintenance and upgrades',
                                 hasComment: false,
-                                aiSuggestion: 'Explain nature of lease dispute, legal outcome, and measures to prevent similar issues. Include case reference number.',
+                                aiSuggestion: 'Significant overage. Break down emergency repairs vs planned upgrades. Include energy efficiency measures planned.',
                                 urgency: 'high'
                               },
                               {
                                 id: 5,
                                 property: 'Stanford GSB',
+                                propertyCode: 'ap172',
                                 glCode: '8100',
-                                glName: 'Capital Improvements',
-                                subGL: '8110 - Elevator Modernization',
-                                budgetAmount: 50000,
-                                actualAmount: 62750,
-                                variancePercent: 25.5,
-                                varianceAmount: 12750,
-                                reason: 'Code compliance upgrades required',
+                                glName: 'Total Debt Service',
+                                subGL: '8115 - HVAC Equipment Financing',
+                                ptdActual: 28500,
+                                ptdBudget: 22000,
+                                ptdVariance: 6500,
+                                ptdVariancePercent: 29.5,
+                                ytdActual: 114000,
+                                ytdBudget: 88000,
+                                ytdVariance: 26000,
+                                ytdVariancePercent: 29.5,
+                                annual: 352000,
+                                reason: 'New HVAC equipment financing payments',
                                 hasComment: false,
-                                aiSuggestion: 'Detail specific code requirements, inspection findings, and timeline for completion. Include permit costs if applicable.',
+                                aiSuggestion: 'Overage above $5K threshold. Detail equipment financing terms, energy savings projections, and ROI timeline.',
                                 urgency: 'medium'
+                              },
+                              {
+                                id: 6,
+                                property: 'Stanford GSB',
+                                propertyCode: 'ap172',
+                                glCode: '4100',
+                                glName: 'Total Net Income',
+                                subGL: '4125 - Parking Revenue',
+                                ptdActual: 35200,
+                                ptdBudget: 28000,
+                                ptdVariance: 7200,
+                                ptdVariancePercent: 25.7,
+                                ytdActual: 140800,
+                                ytdBudget: 112000,
+                                ytdVariance: 28800,
+                                ytdVariancePercent: 25.7,
+                                annual: 448000,
+                                reason: 'Above budget parking revenue - rate increases',
+                                hasComment: false,
+                                aiSuggestion: 'Positive variance exceeds 5% threshold. Detail parking rate changes, occupancy rates, and sustainability of performance.',
+                                urgency: 'low'
                               }
                             ];
 
                             return varianceItems
                               .filter(item => selectedVarianceProperty === 'all' || item.property === 
                                 getPropertiesForRole('pm').find(p => p.id.toString() === selectedVarianceProperty)?.name)
+                              .filter(item => {
+                                // Only show items with variance >$5K or >5%
+                                const ptdVarianceAbs = Math.abs(item.ptdVariance);
+                                const ytdVarianceAbs = Math.abs(item.ytdVariance);
+                                const ptdPercentAbs = Math.abs(item.ptdVariancePercent);
+                                const ytdPercentAbs = Math.abs(item.ytdVariancePercent);
+                                return ptdVarianceAbs >= 5000 || ytdVarianceAbs >= 5000 || ptdPercentAbs >= 5 || ytdPercentAbs >= 5;
+                              })
+                              .filter(item => !item.hasComment) // Only show items without comments
                               .map((item) => (
                               <tr key={item.id} className="border-b border-gray-700 hover:bg-gray-700/30">
-                                <td className="py-3 px-4">
-                                  <div className="text-white font-medium">{item.property}</div>
+                                {/* Account Column */}
+                                <td className="py-2 px-2">
+                                  <div className="text-blue-300 font-medium text-xs">{item.subGL}</div>
+                                  <div className="text-purple-300 text-xs">{item.propertyCode} - {item.property}</div>
+                                  <div className="text-gray-400 text-xs">{item.glCode} - {item.glName}</div>
                                 </td>
-                                <td className="py-3 px-4">
-                                  <div className="text-blue-300 font-medium">{item.glCode} - {item.glName}</div>
-                                  <div className="text-purple-300 text-xs">{item.subGL}</div>
+                                
+                                {/* PTD Actual */}
+                                <td className="py-2 px-2 text-right">
+                                  <div className="text-white text-xs">${item.ptdActual.toLocaleString()}</div>
                                 </td>
-                                <td className="py-3 px-4">
-                                  <div className="text-gray-300">
-                                    <div className="flex items-center gap-2">
-                                      <span className="text-gray-400">Budget:</span>
-                                      <span>${item.budgetAmount.toLocaleString()}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                      <span className="text-gray-400">Actual:</span>
-                                      <span className="text-red-300 font-semibold">${item.actualAmount.toLocaleString()}</span>
-                                    </div>
+                                
+                                {/* PTD Budget */}
+                                <td className="py-2 px-2 text-right">
+                                  <div className="text-gray-300 text-xs">${item.ptdBudget.toLocaleString()}</div>
+                                </td>
+                                
+                                {/* PTD Variance */}
+                                <td className="py-2 px-2 text-right">
+                                  <div className={`text-xs font-semibold ${
+                                    item.ptdVariance >= 0 ? 'text-red-300' : 'text-green-300'
+                                  }`}>
+                                    {item.ptdVariance >= 0 ? '+' : ''}${item.ptdVariance.toLocaleString()}
                                   </div>
                                 </td>
-                                <td className="py-3 px-4">
-                                  <div className="text-red-300 font-semibold">+${item.varianceAmount.toLocaleString()}</div>
-                                  <div className="text-red-200 text-sm">+{item.variancePercent}%</div>
-                                  <div className="text-xs text-orange-300 mt-1">{item.reason}</div>
+                                
+                                {/* PTD % Var */}
+                                <td className="py-2 px-2 text-right">
+                                  <div className={`text-xs font-semibold ${
+                                    item.ptdVariancePercent >= 0 ? 'text-red-300' : 'text-green-300'
+                                  }`}>
+                                    {item.ptdVariancePercent >= 0 ? '+' : ''}{item.ptdVariancePercent.toFixed(1)}%
+                                  </div>
                                 </td>
-                                <td className="py-3 px-4">
+                                
+                                {/* YTD Actual */}
+                                <td className="py-2 px-2 text-right">
+                                  <div className="text-white text-xs">${item.ytdActual.toLocaleString()}</div>
+                                </td>
+                                
+                                {/* YTD Budget */}
+                                <td className="py-2 px-2 text-right">
+                                  <div className="text-gray-300 text-xs">${item.ytdBudget.toLocaleString()}</div>
+                                </td>
+                                
+                                {/* YTD Variance */}
+                                <td className="py-2 px-2 text-right">
+                                  <div className={`text-xs font-semibold ${
+                                    item.ytdVariance >= 0 ? 'text-red-300' : 'text-green-300'
+                                  }`}>
+                                    {item.ytdVariance >= 0 ? '+' : ''}${item.ytdVariance.toLocaleString()}
+                                  </div>
+                                </td>
+                                
+                                {/* YTD % Var */}
+                                <td className="py-2 px-2 text-right">
+                                  <div className={`text-xs font-semibold ${
+                                    item.ytdVariancePercent >= 0 ? 'text-red-300' : 'text-green-300'
+                                  }`}>
+                                    {item.ytdVariancePercent >= 0 ? '+' : ''}{item.ytdVariancePercent.toFixed(1)}%
+                                  </div>
+                                </td>
+                                
+                                {/* Annual */}
+                                <td className="py-2 px-2 text-right">
+                                  <div className="text-gray-300 text-xs">${item.annual.toLocaleString()}</div>
+                                </td>
+                                
+                                {/* Status */}
+                                <td className="py-2 px-2">
                                   {item.hasComment ? (
-                                    <Badge className="bg-green-600 text-green-100">
+                                    <Badge className="bg-green-600 text-green-100 text-xs">
                                       <CheckCircle className="h-3 w-3 mr-1" />
                                       Submitted
                                     </Badge>
                                   ) : (
-                                    <Badge className={`${
+                                    <Badge className={`text-xs ${
                                       item.urgency === 'high' 
                                         ? 'bg-red-600 text-red-100' 
-                                        : 'bg-orange-600 text-orange-100'
+                                        : item.urgency === 'medium'
+                                        ? 'bg-orange-600 text-orange-100'
+                                        : 'bg-yellow-600 text-yellow-100'
                                     }`}>
                                       <AlertTriangle className="h-3 w-3 mr-1" />
-                                      {item.urgency === 'high' ? 'Due Now' : 'Due Soon'}
+                                      {item.urgency === 'high' ? 'Due Now' : item.urgency === 'medium' ? 'Due Soon' : 'Review'}
                                     </Badge>
                                   )}
                                 </td>
-                                <td className="py-3 px-4 max-w-xs">
-                                  <div className="text-gray-300 text-xs leading-tight mb-2">{item.aiSuggestion}</div>
+                                
+                                {/* AI Suggestion */}
+                                <td className="py-2 px-2 max-w-xs">
+                                  <div className="text-gray-300 text-xs leading-tight mb-1">{item.aiSuggestion}</div>
                                   <div className="flex items-center gap-1">
                                     <Bot className="h-3 w-3 text-purple-400" />
                                     <span className="text-xs text-purple-300">AI Assist</span>
                                   </div>
                                 </td>
-                                <td className="py-3 px-4">
+                                
+                                {/* Action */}
+                                <td className="py-2 px-2">
                                   <Button
                                     size="sm"
                                     onClick={() => {
@@ -12259,7 +13124,7 @@ Central Office`,
                                       })
                                       setVarianceCommentDialog(true)
                                     }}
-                                    className={`text-xs px-3 py-1 ${
+                                    className={`text-xs px-2 py-1 ${
                                       item.hasComment 
                                         ? 'bg-blue-600 hover:bg-blue-700 text-white' 
                                         : 'bg-red-600 hover:bg-red-700 text-white'
@@ -12268,14 +13133,305 @@ Central Office`,
                                     {item.hasComment ? (
                                       <>
                                         <Edit className="h-3 w-3 mr-1" />
-                                        Edit Comment
+                                        Edit
                                       </>
                                     ) : (
                                       <>
                                         <AlertTriangle className="h-3 w-3 mr-1" />
-                                        Add Comment
+                                        Add
                                       </>
                                     )}
+                                  </Button>
+                                </td>
+                              </tr>
+                            ));
+                          })()}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Submitted Comments Table */}
+                <Card className="bg-gray-800 border-gray-700">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5" />
+                      Submitted Comments - Completed Variance Explanations
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto max-h-96 overflow-y-auto">
+                      <table className="min-w-full text-xs">
+                        <thead className="border-b border-gray-600 sticky top-0 bg-gray-800">
+                          <tr>
+                            <th className="text-left py-2 px-2 text-gray-400 font-medium">Account</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">PTD Actual</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">PTD Budget</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">Variance</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">% Var</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">YTD Actual</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">YTD Budget</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">Variance</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">% Var</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">Annual</th>
+                            <th className="text-left py-2 px-2 text-gray-400 font-medium">Status</th>
+                            <th className="text-left py-2 px-2 text-gray-400 font-medium">AI Suggestion</th>
+                            <th className="text-left py-2 px-2 text-gray-400 font-medium">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(() => {
+                            // Mock submitted variance comments - GL Report Format
+                            const submittedVarianceItems = [
+                              {
+                                id: 101,
+                                property: 'Mission Bay',
+                                propertyCode: 'mb401',
+                                glCode: '5200', 
+                                glName: 'Total Turnover',
+                                subGL: '5235 - Kitchen Renovations',
+                                ptdActual: 17213,
+                                ptdBudget: 31379,
+                                ptdVariance: -14166,
+                                ptdVariancePercent: -45.1,
+                                ytdActual: 78945,
+                                ytdBudget: 125000,
+                                ytdVariance: -46055,
+                                ytdVariancePercent: -36.8,
+                                annual: 500000,
+                                reason: 'Delayed kitchen renovation projects',
+                                hasComment: true,
+                                comment: 'Kitchen renovation projects delayed due to permit approval process and appliance supply chain issues. Projects rescheduled for Q1 next year.',
+                                aiSuggestion: 'Good explanation. Consider adding timeline for delayed projects and budget carryover plan.',
+                                urgency: 'completed',
+                                submittedDate: '2024-12-15'
+                              },
+                              {
+                                id: 102,
+                                property: 'Stanford GSB',
+                                propertyCode: 'ap172',
+                                glCode: '6400',
+                                glName: 'Total Insurance and Taxes',
+                                subGL: '6425 - Property Insurance',
+                                ptdActual: 42500,
+                                ptdBudget: 35000,
+                                ptdVariance: 7500,
+                                ptdVariancePercent: 21.4,
+                                ytdActual: 170000,
+                                ytdBudget: 140000,
+                                ytdVariance: 30000,
+                                ytdVariancePercent: 21.4,
+                                annual: 560000,
+                                reason: 'Insurance premium increase due to market conditions',
+                                hasComment: true,
+                                comment: 'Property insurance premiums increased 21% due to current market conditions and increased property values. Rate locked for 3-year term to avoid future volatility.',
+                                aiSuggestion: 'Comprehensive explanation covering market factors and future planning.',
+                                urgency: 'completed',
+                                submittedDate: '2024-12-14'
+                              },
+                              {
+                                id: 103,
+                                property: 'Mission Bay',
+                                propertyCode: 'mb401',
+                                glCode: '7300',
+                                glName: 'Total Utilities',
+                                subGL: '7315 - Water & Sewer',
+                                ptdActual: 18750,
+                                ptdBudget: 14000,
+                                ptdVariance: 4750,
+                                ptdVariancePercent: 33.9,
+                                ytdActual: 75000,
+                                ytdBudget: 56000,
+                                ytdVariance: 19000,
+                                ytdVariancePercent: 33.9,
+                                annual: 224000,
+                                reason: 'Water main leak and increased usage rates',
+                                hasComment: true,
+                                comment: 'Water costs increased due to undiscovered water main leak in Q3 that was repaired in October. Additionally, municipal water rates increased 8% effective July 1st.',
+                                aiSuggestion: 'Clear explanation of both emergency issue and rate changes.',
+                                urgency: 'completed',
+                                submittedDate: '2024-12-13'
+                              },
+                              {
+                                id: 104,
+                                property: 'Stanford GSB',
+                                propertyCode: 'ap172',
+                                glCode: '5100',
+                                glName: 'Total Administration',
+                                subGL: '5125 - Legal & Professional',
+                                ptdActual: 28900,
+                                ptdBudget: 22000,
+                                ptdVariance: 6900,
+                                ptdVariancePercent: 31.4,
+                                ytdActual: 115600,
+                                ytdBudget: 88000,
+                                ytdVariance: 27600,
+                                ytdVariancePercent: 31.4,
+                                annual: 352000,
+                                reason: 'Tenant lease renegotiation legal fees',
+                                hasComment: true,
+                                comment: 'Higher legal fees due to complex lease renegotiation with anchor tenant. Process required additional legal counsel specializing in retail leases, resulting in favorable 10-year extension.',
+                                aiSuggestion: 'Excellent detail on ROI justification for legal expenses.',
+                                urgency: 'completed',
+                                submittedDate: '2024-12-12'
+                              },
+                              {
+                                id: 105,
+                                property: 'Mission Bay',
+                                propertyCode: 'mb401',
+                                glCode: '8200',
+                                glName: 'Total Reserves and Replacements',
+                                subGL: '8235 - Roof Replacement Reserve',
+                                ptdActual: 55000,
+                                ptdBudget: 40000,
+                                ptdVariance: 15000,
+                                ptdVariancePercent: 37.5,
+                                ytdActual: 220000,
+                                ytdBudget: 160000,
+                                ytdVariance: 60000,
+                                ytdVariancePercent: 37.5,
+                                annual: 640000,
+                                reason: 'Accelerated roof replacement due to storm damage',
+                                hasComment: true,
+                                comment: 'Roof replacement accelerated due to storm damage in September. Insurance covered 70% of costs. New roof includes 20-year warranty and improved energy efficiency features.',
+                                aiSuggestion: 'Good coverage of insurance and long-term benefits.',
+                                urgency: 'completed',
+                                submittedDate: '2024-12-11'
+                              },
+                              {
+                                id: 106,
+                                property: 'Stanford GSB',
+                                propertyCode: 'ap172',
+                                glCode: '7100',
+                                glName: 'Total Repairs and Maintenance',
+                                subGL: '7145 - Elevator Maintenance',
+                                ptdActual: 31200,
+                                ptdBudget: 24000,
+                                ptdVariance: 7200,
+                                ptdVariancePercent: 30.0,
+                                ytdActual: 124800,
+                                ytdBudget: 96000,
+                                ytdVariance: 28800,
+                                ytdVariancePercent: 30.0,
+                                annual: 384000,
+                                reason: 'Elevator modernization and code compliance',
+                                hasComment: true,
+                                comment: 'Elevator maintenance costs increased due to required modernization to meet new accessibility codes. Work includes controller upgrades and safety system enhancements completed in October.',
+                                aiSuggestion: 'Comprehensive explanation of compliance requirements.',
+                                urgency: 'completed',
+                                submittedDate: '2024-12-10'
+                              }
+                            ];
+
+                            return submittedVarianceItems
+                              .filter(item => selectedVarianceProperty === 'all' || item.property === 
+                                getPropertiesForRole('pm').find(p => p.id.toString() === selectedVarianceProperty)?.name)
+                              .map((item) => (
+                              <tr key={item.id} className="border-b border-gray-700 hover:bg-gray-700/30">
+                                {/* Account Column */}
+                                <td className="py-2 px-2">
+                                  <div className="text-blue-300 font-medium text-xs">{item.subGL}</div>
+                                  <div className="text-purple-300 text-xs">{item.propertyCode} - {item.property}</div>
+                                  <div className="text-gray-400 text-xs">{item.glCode} - {item.glName}</div>
+                                </td>
+                                
+                                {/* PTD Actual */}
+                                <td className="py-2 px-2 text-right">
+                                  <div className="text-white text-xs">${item.ptdActual.toLocaleString()}</div>
+                                </td>
+                                
+                                {/* PTD Budget */}
+                                <td className="py-2 px-2 text-right">
+                                  <div className="text-gray-300 text-xs">${item.ptdBudget.toLocaleString()}</div>
+                                </td>
+                                
+                                {/* PTD Variance */}
+                                <td className="py-2 px-2 text-right">
+                                  <div className={`text-xs font-semibold ${
+                                    item.ptdVariance >= 0 ? 'text-red-300' : 'text-green-300'
+                                  }`}>
+                                    {item.ptdVariance >= 0 ? '+' : ''}${item.ptdVariance.toLocaleString()}
+                                  </div>
+                                </td>
+                                
+                                {/* PTD % Var */}
+                                <td className="py-2 px-2 text-right">
+                                  <div className={`text-xs font-semibold ${
+                                    item.ptdVariancePercent >= 0 ? 'text-red-300' : 'text-green-300'
+                                  }`}>
+                                    {item.ptdVariancePercent >= 0 ? '+' : ''}{item.ptdVariancePercent.toFixed(1)}%
+                                  </div>
+                                </td>
+                                
+                                {/* YTD Actual */}
+                                <td className="py-2 px-2 text-right">
+                                  <div className="text-white text-xs">${item.ytdActual.toLocaleString()}</div>
+                                </td>
+                                
+                                {/* YTD Budget */}
+                                <td className="py-2 px-2 text-right">
+                                  <div className="text-gray-300 text-xs">${item.ytdBudget.toLocaleString()}</div>
+                                </td>
+                                
+                                {/* YTD Variance */}
+                                <td className="py-2 px-2 text-right">
+                                  <div className={`text-xs font-semibold ${
+                                    item.ytdVariance >= 0 ? 'text-red-300' : 'text-green-300'
+                                  }`}>
+                                    {item.ytdVariance >= 0 ? '+' : ''}${item.ytdVariance.toLocaleString()}
+                                  </div>
+                                </td>
+                                
+                                {/* YTD % Var */}
+                                <td className="py-2 px-2 text-right">
+                                  <div className={`text-xs font-semibold ${
+                                    item.ytdVariancePercent >= 0 ? 'text-red-300' : 'text-green-300'
+                                  }`}>
+                                    {item.ytdVariancePercent >= 0 ? '+' : ''}{item.ytdVariancePercent.toFixed(1)}%
+                                  </div>
+                                </td>
+                                
+                                {/* Annual */}
+                                <td className="py-2 px-2 text-right">
+                                  <div className="text-gray-300 text-xs">${item.annual.toLocaleString()}</div>
+                                </td>
+                                
+                                {/* Status */}
+                                <td className="py-2 px-2">
+                                  <Badge className="bg-green-600 text-green-100 text-xs">
+                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                    Submitted
+                                  </Badge>
+                                  <div className="text-gray-400 text-xs mt-1">{item.submittedDate}</div>
+                                </td>
+                                
+                                {/* AI Suggestion */}
+                                <td className="py-2 px-2 max-w-xs">
+                                  <div className="text-gray-300 text-xs leading-tight mb-1">{item.aiSuggestion}</div>
+                                  <div className="flex items-center gap-1">
+                                    <Bot className="h-3 w-3 text-purple-400" />
+                                    <span className="text-xs text-purple-300">AI Assist</span>
+                                  </div>
+                                </td>
+                                
+                                {/* Action */}
+                                <td className="py-2 px-2">
+                                  <Button
+                                    size="sm"
+                                    onClick={() => {
+                                      setSelectedVarianceItem(item)
+                                      setVarianceCommentForm({
+                                        comment: item.comment || '',
+                                        reason: item.reason || '',
+                                        correctiveAction: ''
+                                      })
+                                      setVarianceCommentDialog(true)
+                                    }}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1"
+                                  >
+                                    <Eye className="h-3 w-3 mr-1" />
+                                    View
                                   </Button>
                                 </td>
                               </tr>
@@ -12308,24 +13464,30 @@ Central Office`,
                           <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
                               <span className="text-gray-400">Property:</span>
-                              <span className="text-white ml-2">{selectedVarianceItem.property}</span>
+                              <span className="text-white ml-2">{selectedVarianceItem.propertyCode} - {selectedVarianceItem.property}</span>
                             </div>
                             <div>
-                              <span className="text-gray-400">GL Code:</span>
-                              <span className="text-blue-300 ml-2">{selectedVarianceItem.glCode} - {selectedVarianceItem.glName}</span>
+                              <span className="text-gray-400">Account:</span>
+                              <span className="text-blue-300 ml-2">{selectedVarianceItem.subGL}</span>
                             </div>
                             <div>
-                              <span className="text-gray-400">Budget:</span>
-                              <span className="text-white ml-2">${selectedVarianceItem.budgetAmount.toLocaleString()}</span>
+                              <span className="text-gray-400">PTD Budget:</span>
+                              <span className="text-white ml-2">${selectedVarianceItem.ptdBudget.toLocaleString()}</span>
                             </div>
                             <div>
-                              <span className="text-gray-400">Actual:</span>
-                              <span className="text-red-300 ml-2 font-semibold">${selectedVarianceItem.actualAmount.toLocaleString()}</span>
+                              <span className="text-gray-400">PTD Actual:</span>
+                              <span className="text-red-300 ml-2 font-semibold">${selectedVarianceItem.ptdActual.toLocaleString()}</span>
                             </div>
-                            <div className="col-span-2">
-                              <span className="text-gray-400">Variance:</span>
-                              <span className="text-red-300 ml-2 font-semibold">
-                                +${selectedVarianceItem.varianceAmount.toLocaleString()} (+{selectedVarianceItem.variancePercent}%)
+                            <div>
+                              <span className="text-gray-400">PTD Variance:</span>
+                              <span className={`ml-2 font-semibold ${selectedVarianceItem.ptdVariance >= 0 ? 'text-red-300' : 'text-green-300'}`}>
+                                {selectedVarianceItem.ptdVariance >= 0 ? '+' : ''}${selectedVarianceItem.ptdVariance.toLocaleString()} ({selectedVarianceItem.ptdVariance >= 0 ? '+' : ''}{selectedVarianceItem.ptdVariancePercent.toFixed(1)}%)
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-gray-400">YTD Variance:</span>
+                              <span className={`ml-2 font-semibold ${selectedVarianceItem.ytdVariance >= 0 ? 'text-red-300' : 'text-green-300'}`}>
+                                {selectedVarianceItem.ytdVariance >= 0 ? '+' : ''}${selectedVarianceItem.ytdVariance.toLocaleString()} ({selectedVarianceItem.ytdVariance >= 0 ? '+' : ''}{selectedVarianceItem.ytdVariancePercent.toFixed(1)}%)
                               </span>
                             </div>
                           </div>
@@ -12388,7 +13550,7 @@ Central Office`,
                       <Button
                         onClick={() => {
                           // Save variance comment
-                          alert(`Variance comment saved for ${selectedVarianceItem?.glCode} - ${selectedVarianceItem?.glName}. Chris will be notified.`)
+                          alert(`Variance comment saved for ${selectedVarianceItem?.subGL} at ${selectedVarianceItem?.propertyCode}. Owner will be notified.`)
                           setVarianceCommentDialog(false)
                         }}
                         className="bg-green-600 hover:bg-green-700 text-white"
@@ -14646,9 +15808,11 @@ Central Office`,
                                                              <tr>
                                  <th className="text-left py-2 px-3 text-orange-200">Date</th>
                                  <th className="text-left py-2 px-3 text-orange-200">Merchant</th>
-                                 <th className="text-left py-2 px-3 text-orange-200">GL Code</th>
-                                 <th className="text-left py-2 px-3 text-orange-200">Sub-GL</th>
+                                 <th className="text-left py-2 px-3 text-orange-200">GL Sub-Code</th>
                                  <th className="text-left py-2 px-3 text-orange-200">Amount</th>
+                                 <th className="text-right py-2 px-3 text-orange-200">Budget</th>
+                                 <th className="text-right py-2 px-3 text-orange-200">Variance</th>
+                                 <th className="text-right py-2 px-3 text-orange-200">% Var</th>
                                  <th className="text-left py-2 px-3 text-orange-200">PM Memo</th>
                                  <th className="text-left py-2 px-3 text-orange-200">AI Analysis</th>
                                  <th className="text-left py-2 px-3 text-orange-200">Action</th>
@@ -14656,7 +15820,7 @@ Central Office`,
                             </thead>
                             <tbody>
                               {(() => {
-                                // Generate flagged expenses with AI memos
+                                // Generate flagged expenses with AI memos and budget data
                                                                  const flaggedExpenses = [
                                    {
                                      date: '2025-01-15',
@@ -14666,8 +15830,15 @@ Central Office`,
                                      glName: 'Repairs & Maintenance',
                                      subGlCode: '7210',
                                      subGlName: 'HVAC Repairs',
+                                     monthlyBudget: 1200,
+                                     budgetVariance: -450,
+                                     budgetVariancePercent: -37.5,
+                                     ytdBudget: 14400,
+                                     ytdActual: 8950,
+                                     ytdVariance: -5450,
+                                     ytdVariancePercent: -37.8,
                                      pmMemo: 'Emergency heating failure - Unit #3B. Approved by owner Smith via phone call. Parts needed ASAP for tenant comfort.',
-                                     aiMemo: 'Amount exceeds $500 threshold for HVAC category. Similar vendor pattern shows 40% increase vs. last quarter. Recommend owner approval before processing.',
+                                     aiMemo: 'Over $500 threshold. 40% increase vs Q4. Needs owner approval.',
                                      aiConfidence: 94,
                                      flagReason: 'Amount threshold exceeded'
                                    },
@@ -14679,8 +15850,15 @@ Central Office`,
                                      glName: 'Office Expenses',
                                      subGlCode: '6110',
                                      subGlName: 'Office Supplies',
+                                     monthlyBudget: 250,
+                                     budgetVariance: 375.75,
+                                     budgetVariancePercent: 150.3,
+                                     ytdBudget: 3000,
+                                     ytdActual: 2850,
+                                     ytdVariance: -150,
+                                     ytdVariancePercent: -5.0,
                                      pmMemo: 'Bulk supplies for Q1 tenant move-outs. Includes cleaning supplies, paint, and office materials for leasing office setup.',
-                                     aiMemo: 'Office expense 250% above monthly average ($187.50). No prior approval detected. Consider if this should be allocated to property improvement rather than operating expense.',
+                                     aiMemo: '250% over monthly budget. Check if should be property improvement.',
                                      aiConfidence: 87,
                                      flagReason: 'Unusual amount pattern'
                                    },
@@ -14692,8 +15870,15 @@ Central Office`,
                                      glName: 'Repairs & Maintenance',
                                      subGlCode: '7220',
                                      subGlName: 'Plumbing Repairs',
+                                     monthlyBudget: 800,
+                                     budgetVariance: 450,
+                                     budgetVariancePercent: 56.3,
+                                     ytdBudget: 9600,
+                                     ytdActual: 11250,
+                                     ytdVariance: 1650,
+                                     ytdVariancePercent: 17.2,
                                      pmMemo: 'Water main break in basement - emergency repair. Contacted owner but no response. Made executive decision to prevent water damage.',
-                                     aiMemo: 'Emergency repair claim over $1000 requires owner pre-approval per policy. No emergency documentation found. Verify if this qualifies as emergency repair.',
+                                     aiMemo: 'Over $1000, requires pre-approval. Missing emergency docs.',
                                      aiConfidence: 96,
                                      flagReason: 'Policy violation - Missing pre-approval'
                                    }
@@ -14704,16 +15889,32 @@ Central Office`,
                                     <td className="py-2 px-3 text-gray-300">{expense.date}</td>
                                     <td className="py-2 px-3 text-gray-300">{expense.merchant}</td>
                                     <td className="py-2 px-3">
-                                      <div className="text-blue-300">{expense.glCode}</div>
-                                      <div className="text-xs text-blue-200">{expense.glName}</div>
+                                      <div className="text-blue-300 font-medium">{expense.subGlCode} - {expense.subGlName}</div>
+                                      <div className="text-xs text-blue-200">{expense.glCode} - {expense.glName}</div>
                                     </td>
                                     <td className="py-2 px-3">
-                                      <div className="text-purple-300">{expense.subGlCode}</div>
-                                      <div className="text-xs text-purple-200">{expense.subGlName}</div>
-                                    </td>
-                                                                         <td className="py-2 px-3">
                                        <div className="text-red-300 font-semibold">${expense.amount.toFixed(2)}</div>
                                        <div className="text-xs text-orange-300">{expense.flagReason}</div>
+                                     </td>
+                                     <td className="py-2 px-3 text-right">
+                                       <div className="text-gray-300">${expense.monthlyBudget.toLocaleString()}</div>
+                                       <div className="text-xs text-gray-400">Monthly</div>
+                                     </td>
+                                     <td className="py-2 px-3 text-right">
+                                       <div className={`font-semibold ${
+                                         expense.budgetVariance >= 0 ? 'text-red-300' : 'text-green-300'
+                                       }`}>
+                                         {expense.budgetVariance >= 0 ? '+' : ''}${expense.budgetVariance.toLocaleString()}
+                                       </div>
+                                       <div className="text-xs text-gray-400">vs Budget</div>
+                                     </td>
+                                     <td className="py-2 px-3 text-right">
+                                       <div className={`font-semibold ${
+                                         expense.budgetVariancePercent >= 0 ? 'text-red-300' : 'text-green-300'
+                                       }`}>
+                                         {expense.budgetVariancePercent >= 0 ? '+' : ''}{expense.budgetVariancePercent.toFixed(1)}%
+                                       </div>
+                                       <div className="text-xs text-gray-400">Monthly</div>
                                      </td>
                                      <td className="py-2 px-3 max-w-xs">
                                        <div className="text-gray-300 text-xs leading-tight mb-1">{expense.pmMemo}</div>
@@ -14733,10 +15934,10 @@ Central Office`,
                                       <Button
                                         size="sm"
                                         onClick={() => handleRequestInfoFromPM(expense)}
-                                        className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1"
+                                        className="bg-orange-600 hover:bg-orange-700 text-white text-xs px-2 py-1"
                                       >
                                         <MessageSquare className="h-3 w-3 mr-1" />
-                                        Request Info
+                                        More Info
                                       </Button>
                                     </td>
                                   </tr>
@@ -14746,9 +15947,14 @@ Central Office`,
                           </table>
                         </div>
 
-                        <div className="mt-3 text-xs text-orange-300 flex items-center gap-2">
-                          <AlertTriangle className="h-4 w-4" />
-                          3 expenses flagged for review • Total flagged amount: $2,625.75
+                        <div className="mt-3 text-xs text-orange-300 flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <AlertTriangle className="h-4 w-4" />
+                            3 expenses flagged for review • Total: $2,625.75
+                          </div>
+                          <div className="text-xs text-red-300">
+                            Budget variance: +$375.75 (+23.5% avg)
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -14757,8 +15963,13 @@ Central Office`,
                     <div>
                       <Label className="text-gray-300 mb-3 block">📊 Monthly GL Report Preview</Label>
                       <div className="bg-gray-800 border border-gray-600 rounded-lg p-4">
-                        <div className="mb-3">
-                          <h4 className="text-sm font-semibold text-white mb-1">Monthly GL-Coded Expense Report</h4>
+                        <div className="mb-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                              <CheckCircle className="w-3 h-3 text-white" />
+                            </div>
+                            <h4 className="text-sm font-semibold text-white">✓ Submitted Comments - Completed Variance Explanations</h4>
+                          </div>
                           <div className="text-xs text-gray-400">
                             {selectedPropertyForMonthly.name} • {new Date(selectedMonth + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                           </div>
@@ -14786,162 +15997,219 @@ Central Office`,
                           </div>
                         </div>
 
-                        <div className="max-h-64 overflow-y-auto border border-gray-600 rounded">
-                          <TooltipProvider>
-                            <table className="min-w-full text-xs">
-                              <thead className="sticky top-0 bg-gray-900 border-b border-gray-600">
-                                <tr>
-                                  <th className="text-left py-2 px-3 text-gray-400">Date</th>
-                                  <th className="text-left py-2 px-3 text-gray-400">Merchant</th>
-                                  <th className="text-left py-2 px-3 text-gray-400">GL Code</th>
-                                  <th className="text-left py-2 px-3 text-gray-400">Sub-GL</th>
-                                  <th className="text-left py-2 px-3 text-gray-400">Property Code</th>
-                                  <th className="text-left py-2 px-3 text-gray-400">Billable?</th>
-                                  <th className="text-left py-2 px-3 text-gray-400">
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <span className="cursor-help">Flag spend</span>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <div>
-                                          <div className="text-sm font-semibold">Auto-flagged spend that triggered owner's approval threshold</div>
-                                          <div className="text-xs text-gray-400">
-                                            Expenses over $500 require pre-approval
-                                          </div>
-                                        </div>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </th>
-                                  <th className="text-left py-2 px-3 text-gray-400">Memo/Notes</th>
-                                  <th className="text-left py-2 px-3 text-gray-400">Receipt</th>
-                                  <th className="text-right py-2 px-3 text-gray-400">Amount</th>
-                                </tr>
-                              </thead>
+                        <div className="max-h-96 overflow-y-auto border border-gray-600 rounded">
+                          <table className="min-w-full text-xs">
+                            <thead className="sticky top-0 bg-gray-900 border-b border-gray-600">
+                              <tr>
+                                <th className="text-left py-3 px-4 font-semibold text-white">Account</th>
+                                <th className="text-left py-3 px-4 font-semibold text-white">PTD Actual</th>
+                                <th className="text-left py-3 px-4 font-semibold text-white">PTD Budget</th>
+                                <th className="text-left py-3 px-4 font-semibold text-white">Variance</th>
+                                <th className="text-left py-3 px-4 font-semibold text-white">% Var</th>
+                                <th className="text-left py-3 px-4 font-semibold text-white">YTD Actual</th>
+                                <th className="text-left py-3 px-4 font-semibold text-white">YTD Budget</th>
+                                <th className="text-left py-3 px-4 font-semibold text-white">Variance</th>
+                                <th className="text-left py-3 px-4 font-semibold text-white">% Var</th>
+                                <th className="text-left py-3 px-4 font-semibold text-white">Annual</th>
+                                <th className="text-left py-3 px-4 font-semibold text-white">Status</th>
+                                <th className="text-left py-3 px-4 font-semibold text-white">PM Memo</th>
+                                <th className="text-left py-3 px-4 font-semibold text-white">Action</th>
+                              </tr>
+                            </thead>
                             <tbody>
                               {(() => {
-                                // Generate sample transactions for the selected month
-                                const sampleTransactions = [
+                                // Multiple GL Code Entries
+                                const glEntries = [
                                   {
-                                    date: '2025-01-15',
-                                    vendor: 'Home Depot',
-                                    amount: 750.00,
-                                    billable: true,
-                                    memo: 'Owner-approved, HVAC repair parts',
-                                    receipt: '[Link]'
+                                    glCode: '7200',
+                                    glDescription: 'HVAC System Maintenance',
+                                    property: selectedPropertyForMonthly.name.split(' ')[0] + ' ' + selectedPropertyForMonthly.name.split(' ')[1] || '01 STANFORD',
+                                    parentCode: '7200 - Total Maintenance and Repairs',
+                                    ptdActual: 2186.49,
+                                    ptdBudget: 1500.00,
+                                    ytdActual: 15850.00,
+                                    ytdBudget: 12000.00,
+                                    annual: 35000,
+                                    memo: 'Emergency repairs and preventive maintenance completed.',
+                                    submittedDate: '2024-12-15'
                                   },
                                   {
-                                    date: '2025-01-16',
-                                    vendor: 'Lowes',
-                                    amount: 275.50,
-                                    billable: true,
-                                    memo: 'Paint supplies',
-                                    receipt: '[Link]'
+                                    glCode: '6425',
+                                    glDescription: 'Property Insurance',
+                                    property: selectedPropertyForMonthly.name.split(' ')[0] + ' ' + selectedPropertyForMonthly.name.split(' ')[1] || '01 STANFORD',
+                                    parentCode: '6400 - Insurance and Taxes',
+                                    ptdActual: 1725.00,
+                                    ptdBudget: 1200.00,
+                                    ytdActual: 8950.00,
+                                    ytdBudget: 7200.00,
+                                    annual: 18500,
+                                    memo: 'Annual policy renewal with coverage adjustments.',
+                                    submittedDate: '2024-12-14'
                                   },
                                   {
-                                    date: '2025-01-17',
-                                    vendor: 'Office Depot',
-                                    amount: 625.75,
-                                    billable: false,
-                                    memo: 'Owner-approved, Office supplies',
-                                    receipt: '[Link]'
+                                    glCode: '7315',
+                                    glDescription: 'Water & Sewer',
+                                    property: selectedPropertyForMonthly.name.split(' ')[0] + ' ' + selectedPropertyForMonthly.name.split(' ')[1] || '01 STANFORD',
+                                    parentCode: '7300 - Total Utilities',
+                                    ptdActual: 945.50,
+                                    ptdBudget: 850.00,
+                                    ytdActual: 5680.00,
+                                    ytdBudget: 5100.00,
+                                    annual: 12200,
+                                    memo: 'Seasonal usage increase due to irrigation needs.',
+                                    submittedDate: '2024-12-13'
                                   },
                                   {
-                                    date: '2025-01-18',
-                                    vendor: 'Ace Hardware',
-                                    amount: 345.25,
-                                    billable: true,
-                                    memo: 'Plumbing tools',
-                                    receipt: '[Link]'
+                                    glCode: '5125',
+                                    glDescription: 'Legal & Professional',
+                                    property: selectedPropertyForMonthly.name.split(' ')[0] + ' ' + selectedPropertyForMonthly.name.split(' ')[1] || '01 STANFORD',
+                                    parentCode: '5100 - Total Administration',
+                                    ptdActual: 850.00,
+                                    ptdBudget: 600.00,
+                                    ytdActual: 4950.00,
+                                    ytdBudget: 3600.00,
+                                    annual: 9500,
+                                    memo: 'Tenant lease consultation and compliance review.',
+                                    submittedDate: '2024-12-12'
                                   },
                                   {
-                                    date: '2025-01-19',
-                                    vendor: 'Sherwin Williams',
-                                    amount: 189.99,
-                                    billable: true,
-                                    memo: 'Interior paint',
-                                    receipt: '[Link]'
+                                    glCode: '8235',
+                                    glDescription: 'Roof Replacement Reserve',
+                                    property: selectedPropertyForMonthly.name.split(' ')[0] + ' ' + selectedPropertyForMonthly.name.split(' ')[1] || '01 STANFORD',
+                                    parentCode: '8200 - Total Reserves and Replacements',
+                                    ptdActual: 3200.00,
+                                    ptdBudget: 2500.00,
+                                    ytdActual: 18900.00,
+                                    ytdBudget: 15000.00,
+                                    annual: 32000,
+                                    memo: 'Accelerated reserve funding for upcoming roof work.',
+                                    submittedDate: '2024-12-11'
                                   }
                                 ];
                                 
-                                return sampleTransactions.map((txn, idx) => {
-                                  const glCode = txn.billable ? '7200 - Repairs & Maintenance' : '6100 - Office Expenses';
-                                  const subGlCode = txn.billable ? '7210 - HVAC Repairs' : '6110 - Office Supplies';
-                                  const propertyCode = selectedPropertyForMonthly.id.toUpperCase();
-                                  
-                                  // Demo flagging logic - flag specific items for demo purposes
-                                  const shouldBeFlagged = txn.amount >= 500 || txn.vendor === 'Home Depot' || (txn.memo && txn.memo.includes('HVAC'));
+                                return glEntries.map((glEntry, idx) => {
+                                  const ptdVariance = glEntry.ptdActual - glEntry.ptdBudget;
+                                  const ptdVariancePercent = ((ptdVariance / glEntry.ptdBudget) * 100);
+                                  const ytdVariance = glEntry.ytdActual - glEntry.ytdBudget;
+                                  const ytdVariancePercent = ((ytdVariance / glEntry.ytdBudget) * 100);
                                   
                                   return (
-                                    <tr key={idx} className="border-b border-gray-700 hover:bg-gray-700/30">
-                                      <td className="py-2 px-3 text-gray-300">{txn.date}</td>
-                                      <td className="py-2 px-3 text-gray-300">{txn.vendor}</td>
-                                      <td className="py-2 px-3 text-blue-300">{glCode}</td>
-                                      <td className="py-2 px-3 text-purple-300">{subGlCode}</td>
-                                      <td className="py-2 px-3 text-purple-300">{propertyCode}</td>
-                                      <td className="py-2 px-3">
-                                        <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs ${
-                                          txn.billable ? 'bg-green-700 text-green-100' : 'bg-gray-700 text-gray-200'
-                                        }`}>
-                                          {txn.billable ? 'Yes' : 'No'}
+                                    <tr key={idx} className="border-b border-gray-600/50">
+                                      <td className="p-3">
+                                        <div className="text-white font-medium">
+                                          {glEntry.glCode} - {glEntry.glDescription}
+                                        </div>
+                                        <div className="text-purple-400 text-xs font-medium">
+                                          {glEntry.property}
+                                        </div>
+                                        <div className="text-gray-400 text-xs">
+                                          {glEntry.parentCode}
+                                        </div>
+                                      </td>
+                                      <td className="p-3 text-white">${glEntry.ptdActual.toLocaleString()}</td>
+                                      <td className="p-3 text-white">${glEntry.ptdBudget.toLocaleString()}</td>
+                                      <td className="p-3">
+                                        <span className={ptdVariance >= 0 ? "text-green-400" : "text-red-400"}>
+                                          {ptdVariance >= 0 ? '+' : ''}${ptdVariance.toLocaleString()}
                                         </span>
                                       </td>
-                                      <td className="py-2 px-3">
-                                        <TooltipProvider>
-                                          <Tooltip>
-                                            <TooltipTrigger asChild>
-                                              <span className="cursor-help">
-                                                {shouldBeFlagged ? (
-                                                  <Badge className="bg-orange-700 text-orange-100 text-xs flex items-center gap-1">
-                                                    <Flag className="h-4 w-4" />
-                                                    Flagged
-                                                  </Badge>
-                                                ) : (
-                                                  <Badge className="bg-gray-700 text-gray-300 text-xs flex items-center gap-1">
-                                                    <CheckCircle className="h-4 w-4" />
-                                                    Clear
-                                                  </Badge>
-                                                )}
-                                              </span>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                              {shouldBeFlagged ? (
-                                                <div>
-                                                  <div className="text-sm font-semibold">Auto-flagged spend that triggered owner's threshold for approval</div>
-                                                  <div className="text-xs text-gray-400">
-                                                    {txn.amount >= 500 ? 'Amount exceeds $500 threshold' : ''}
-                                                    {txn.vendor === 'Home Depot' ? 'High-spend vendor flagged' : ''}
-                                                    {txn.memo && txn.memo.includes('HVAC') ? 'HVAC expenses require approval' : ''}
-                                                  </div>
-                                                </div>
-                                              ) : (
-                                                <div className="text-sm">No flags - approved for processing</div>
-                                              )}
-                                            </TooltipContent>
-                                          </Tooltip>
-                                        </TooltipProvider>
+                                      <td className="p-3">
+                                        <span className={ptdVariancePercent >= 0 ? "text-green-400" : "text-red-400"}>
+                                          {ptdVariancePercent >= 0 ? '+' : ''}{ptdVariancePercent.toFixed(1)}%
+                                        </span>
                                       </td>
-                                      <td className="py-2 px-3 text-gray-300">{txn.memo}</td>
-                                      <td className="py-2 px-3">
-                                        <span className="text-blue-400 cursor-pointer hover:text-blue-300">{txn.receipt}</span>
+                                      <td className="p-3 text-white">${glEntry.ytdActual.toLocaleString()}</td>
+                                      <td className="p-3 text-white">${glEntry.ytdBudget.toLocaleString()}</td>
+                                      <td className="p-3">
+                                        <span className={ytdVariance >= 0 ? "text-green-400" : "text-red-400"}>
+                                          {ytdVariance >= 0 ? '+' : ''}${ytdVariance.toLocaleString()}
+                                        </span>
                                       </td>
-                                      <td className="py-2 px-3 text-right text-gray-300">${txn.amount.toFixed(2)}</td>
+                                      <td className="p-3">
+                                        <span className={ytdVariancePercent >= 0 ? "text-green-400" : "text-red-400"}>
+                                          {ytdVariancePercent >= 0 ? '+' : ''}{ytdVariancePercent.toFixed(1)}%
+                                        </span>
+                                      </td>
+                                      <td className="p-3 text-white">${glEntry.annual.toLocaleString()}</td>
+                                      <td className="p-3">
+                                        <div className="flex items-center gap-2">
+                                          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                          <div>
+                                            <div className="text-green-400 font-medium text-xs">✓ Submitted</div>
+                                            <div className="text-gray-400 text-xs">{glEntry.submittedDate}</div>
+                                          </div>
+                                        </div>
+                                      </td>
+                                      <td className="p-3">
+                                        <div className="text-gray-300 text-xs max-w-xs">
+                                          {glEntry.memo}
+                                        </div>
+                                      </td>
+                                      <td className="p-3">
+                                        <Button
+                                          size="sm"
+                                          className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1"
+                                          onClick={() => {
+                                            // Set up expense for viewing
+                                            setSelectedExpenseForView({
+                                              id: `gl-${glEntry.glCode}`,
+                                              glCode: glEntry.glCode,
+                                              description: glEntry.glDescription,
+                                              amount: glEntry.ptdActual,
+                                              property: glEntry.property,
+                                              memo: glEntry.memo,
+                                              submittedDate: glEntry.submittedDate,
+                                              ptdActual: glEntry.ptdActual,
+                                              ptdBudget: glEntry.ptdBudget,
+                                              ytdActual: glEntry.ytdActual,
+                                              ytdBudget: glEntry.ytdBudget,
+                                              annual: glEntry.annual,
+                                              // Enhanced data for comprehensive view
+                                              vendor: glEntry.glCode === '7200' ? 'HVAC Solutions Inc' : 
+                                                     glEntry.glCode === '6425' ? 'Nationwide Insurance' :
+                                                     glEntry.glCode === '7315' ? 'Metro Water District' :
+                                                     glEntry.glCode === '5125' ? 'Legal Associates LLC' : 'Construction Reserve Fund',
+                                              invoiceNumber: `INV-2024-${1000 + idx}`,
+                                              dueDate: new Date(Date.now() + (7 + idx) * 24 * 60 * 60 * 1000).toLocaleDateString(),
+                                              workOrderId: `job${idx + 1}`,
+                                              receiptUrl: `/receipts/gl-${glEntry.glCode}-receipt.pdf`,
+                                              expenseDetails: {
+                                                category: glEntry.glCode === '7200' ? 'Maintenance & Repairs' : 
+                                                         glEntry.glCode === '6425' ? 'Property Insurance' :
+                                                         glEntry.glCode === '7315' ? 'Utilities' :
+                                                         glEntry.glCode === '5125' ? 'Legal & Professional' : 'Capital Reserve',
+                                                submittedBy: 'Property Manager',
+                                                submittedDate: glEntry.submittedDate,
+                                                approvalStatus: 'Approved',
+                                                approvedBy: 'Central Office',
+                                                approvedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+                                                notes: `${glEntry.memo} Budget variance: ${((glEntry.ptdActual - glEntry.ptdBudget) / glEntry.ptdBudget * 100).toFixed(1)}% over PTD budget due to seasonal adjustments and emergency requirements.`,
+                                                priority: glEntry.ptdActual > glEntry.ptdBudget * 1.2 ? 'High' : 'Normal',
+                                                billable: glEntry.glCode.startsWith('7') || glEntry.glCode.startsWith('8'),
+                                                relatedWorkOrders: [`job${idx + 1}`],
+                                                attachments: [
+                                                  `invoice-${glEntry.glCode}.pdf`,
+                                                  `receipt-${glEntry.glCode}.pdf`,
+                                                  `approval-${glEntry.glCode}.pdf`
+                                                ]
+                                              }
+                                            });
+                                            setExpenseDetailsDialogOpen(true);
+                                          }}
+                                        >
+                                          View
+                                        </Button>
+                                      </td>
                                     </tr>
                                   );
                                 });
                               })()}
                             </tbody>
-                            <tfoot className="bg-gray-900 border-t border-gray-600">
-                              <tr>
-                                <td colSpan={9} className="py-2 px-3 text-right font-semibold text-gray-300">Total:</td>
-                                <td className="py-2 px-3 text-right font-semibold text-white">$2,186.49</td>
-                              </tr>
-                            </tfoot>
-                            </table>
-                          </TooltipProvider>
+                          </table>
                         </div>
                         
                         <div className="mt-3 text-xs text-gray-400">
-                          * This is a preview of the GL report that will be generated and sent to the owner
+                          * This GL variance report will be included with the monthly reimbursement processing
                         </div>
                       </div>
                     </div>

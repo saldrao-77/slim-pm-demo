@@ -85,6 +85,7 @@ import {
   collateralDocuments, 
   documentTypeLabels, 
   propertyOptions, 
+  areaOptions,
   staffOptions, 
   DocumentType, 
   CollateralDocument,
@@ -130,9 +131,9 @@ export default function OwnerDashboard() {
   }[]>([
     {
       id: "1",
-      propertyId: "redwood",
-      propertyName: "Redwood Shores Office Complex",
-      senderId: "pm1",
+          propertyId: "redwood",
+    propertyName: "03 DOWNTOWN",
+    senderId: "pm1",
       senderName: "Jessica Chen",
       senderRole: "pm",
       content: "Hi! I wanted to update you on the HVAC repair work order. We've received quotes from 3 contractors and are ready to proceed with the work.",
@@ -155,7 +156,7 @@ export default function OwnerDashboard() {
     {
       id: "3",
       propertyId: "mission",
-      propertyName: "Mission Bay Tech Campus",
+      propertyName: "02 SUNNYVALE",
       senderId: "pm2",
       senderName: "James Wilson",
       senderRole: "pm",
@@ -761,7 +762,7 @@ function DashboardTab({ setActiveTab }: { setActiveTab?: (tab: string) => void }
                 <div className="p-2 bg-gray-900 rounded">
                   <div className="text-xs text-green-400">Best Performance</div>
                   <div className="text-sm text-white">Sarah Chen</div>
-                  <div className="text-xs text-gray-400">Stanford GSB • -11.6%</div>
+                  <div className="text-xs text-gray-400">01 STANFORD • -11.6%</div>
                 </div>
                 <div className="p-2 bg-gray-900 rounded">
                   <div className="text-xs text-red-400">Needs Attention</div>
@@ -927,13 +928,15 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
       amount: 5500.00,
       type: "Vendor",
       madeBy: "Jessica Chen (Property Manager)",
-      property: "Stanford Graduate School of Business",
+      property: "01 STANFORD",
       workOrder: "HVAC System Maintenance - Annual Service",
       workOrderId: "job1",
       isWorkOrderRelated: true,
       memo: "Energy efficient retrofit for entire building",
       receipt: "✓",
-      status: "Flagged"
+      status: "Flagged",
+      glCode: "522.1",
+      glName: "HVAC Repairs"
     },
     {
       id: "exp2",
@@ -942,13 +945,15 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
       amount: 4800.00,
       type: "Vendor",
       madeBy: "David Chen (Property Manager)",
-      property: "Mission Bay Tech Campus",
+      property: "02 SUNNYVALE",
       workOrder: "Emergency Plumbing Repair - Kitchen Sink",
       workOrderId: "job2",
       isWorkOrderRelated: true,
       memo: "Upgrade req...",
       receipt: "✓",
-      status: "Flagged"
+      status: "Flagged",
+      glCode: "522.2",
+      glName: "Plumbing Repairs"
     },
     {
       id: "exp3",
@@ -957,13 +962,15 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
       amount: 2800.00,
       type: "Card",
       madeBy: "Mike Rodriguez (Property Manager)",
-      property: "Redwood Shores Office Complex",
+      property: "03 DOWNTOWN",
       workOrder: "Kitchen Renovation - Countertop Replacement",
       workOrderId: "job4",
       isWorkOrderRelated: true,
       memo: "Emergency t...",
       receipt: "✓",
-      status: "Flagged"
+      status: "Flagged",
+      glCode: "522.2",
+      glName: "Plumbing Repairs"
     },
     {
       id: "exp3a",
@@ -972,13 +979,15 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
       amount: 245.00,
       type: "Card",
       madeBy: "Alice Johnson (Technician)",
-      property: "Stanford Graduate School of Business",
+      property: "01 STANFORD",
       workOrder: null,
       workOrderId: null,
       isWorkOrderRelated: false,
       memo: "General office supplies",
       receipt: "✓",
-      status: "Flagged"
+      status: "Flagged",
+      glCode: "505.3",
+      glName: "Maintenance Supplies"
     }
   ]
 
@@ -991,13 +1000,15 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
       amount: 1850.00,
       type: "Card",
       madeBy: "Alice Johnson (Technician)",
-      property: "Financial District Tower",
+      property: "01 STANFORD",
       workOrder: "Electrical Panel Upgrade",
       workOrderId: "job5",
       isWorkOrderRelated: true,
       status: "Processed",
       memo: "Routine task leak fix",
-      receipt: "✓"
+      receipt: "✓",
+      glCode: "522.3",
+      glName: "Electrical Repairs"
     },
     {
       id: "exp5",
@@ -1006,13 +1017,15 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
       amount: 320.00,
       type: "Card",
       madeBy: "Bob Wilson (Technician)",
-      property: "Palo Alto Research Center",
+      property: "02 SUNNYVALE",
       workOrder: null,
       workOrderId: null,
       isWorkOrderRelated: false,
       status: "Processed",
       memo: "Monthly cleaning service",
-      receipt: "✓"
+      receipt: "✓",
+      glCode: "520.1",
+      glName: "Cleaning Services"
     },
     {
       id: "exp6",
@@ -1021,13 +1034,15 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
       amount: 12000.00,
       type: "Vendor",
       madeBy: "Sarah Kim (Property Manager)",
-      property: "Apple Park Campus",
+      property: "03 DOWNTOWN",
       workOrder: null,
       workOrderId: null,
       isWorkOrderRelated: false,
       status: "Processed",
       memo: "Quarterly maintenance",
-      receipt: "✓"
+      receipt: "✓",
+      glCode: "521.1",
+      glName: "Landscaping & Grounds"
     },
     {
       id: "exp7",
@@ -1036,13 +1051,15 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
       amount: 450.00,
       type: "Card",
       madeBy: "Jennifer Lopez (Technician)",
-      property: "Redwood City Office",
+      property: "01 STANFORD",
       workOrder: null,
       workOrderId: null,
       isWorkOrderRelated: false,
       status: "Processed",
       memo: "Regular office supplies",
-      receipt: "✓"
+      receipt: "✓",
+      glCode: "505.3",
+      glName: "Maintenance Supplies"
     }
   ]
 
@@ -1055,13 +1072,15 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
       amount: 150.00,
       type: "Card",
       madeBy: "John Smith",
-      property: "Stanford GSB",
+      property: "01 STANFORD",
       workOrder: "HVAC System Maintenance - Annual Service",
       errorType: "Missing receipt",
       aiFlag: "Missing receipt",
       billable: "Yes",
       status: "Reimbursed",
-      description: "Purchase receipt not uploaded to system"
+      description: "Purchase receipt not uploaded to system",
+      glCode: "522.1",
+      glName: "HVAC Repairs"
     },
     {
       id: "error2", 
@@ -1070,13 +1089,15 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
       amount: 45.25,
       type: "Card",
       madeBy: "Alice Johnson",
-      property: "Stanford GSB",
+      property: "01 STANFORD",
       workOrder: "HVAC System Maintenance - Annual Service",
       errorType: "Wrong property",
       aiFlag: "Wrong property",
       billable: "No",
       status: "Non-Reimbursable",
-      description: "Expense charged to wrong property code"
+      description: "Expense charged to wrong property code",
+      glCode: "522.1",
+      glName: "HVAC Repairs"
     },
     {
       id: "error3",
@@ -1085,13 +1106,15 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
       amount: 89.99,
       type: "Card",
       madeBy: "Lisa Wong",
-      property: "Sunnyvale 432",
+      property: "02 SUNNYVALE",
       workOrder: "Emergency Plumbing Repair - Kitchen Sink",
       errorType: "Unusual amount",
       aiFlag: "Unusual amount",
       billable: "No",
       status: "Non-Reimbursable", 
-      description: "Amount significantly higher than typical for this vendor/category"
+      description: "Amount significantly higher than typical for this vendor/category",
+      glCode: "505.3",
+      glName: "Maintenance Supplies"
     },
     {
       id: "error4",
@@ -1100,13 +1123,15 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
       amount: 2500.00,
       type: "Vendor",
       madeBy: "Property Manager",
-      property: "Sunnyvale 432",
+      property: "02 SUNNYVALE",
       workOrder: "Electrical Panel Upgrade",
       errorType: "Missing receipt",
       aiFlag: "Missing receipt",
       billable: "Yes",
       status: "Pending",
-      description: "High-value transaction without supporting documentation"
+      description: "High-value transaction without supporting documentation",
+      glCode: "522.3",
+      glName: "Electrical Repairs"
     }
   ]
 
@@ -1119,13 +1144,15 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
       amount: 5500.00,
       type: "Vendor",
       madeBy: "Jessica Chen (Property Manager)",
-      property: "Stanford Graduate School of Business",
+      property: "01 STANFORD",
       workOrder: "HVAC System Maintenance - Annual Service",
       workOrderId: "job1",
       isWorkOrderRelated: true,
       memo: "Energy efficient retrofit for entire building",
       receipt: "✓",
-      status: "Flagged"
+      status: "Flagged",
+      glCode: "522.1",
+      glName: "HVAC Repairs"
     },
     {
       id: "exp2",
@@ -1134,13 +1161,15 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
       amount: 4800.00,
       type: "Vendor",
       madeBy: "David Chen (Property Manager)",
-      property: "Mission Bay Tech Campus",
+      property: "02 SUNNYVALE",
       workOrder: "Emergency Plumbing Repair - Kitchen Sink",
       workOrderId: "job2",
       isWorkOrderRelated: true,
       memo: "Upgrade req...",
       receipt: "✓",
-      status: "Flagged"
+      status: "Flagged",
+      glCode: "522.2",
+      glName: "Plumbing Repairs"
     },
     {
       id: "exp4",
@@ -1149,13 +1178,15 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
       amount: 1850.00,
       type: "Card",
       madeBy: "Alice Johnson (Technician)",
-      property: "Financial District Tower",
+      property: "03 DOWNTOWN",
       workOrder: "Electrical Panel Upgrade",
       workOrderId: "job5",
       isWorkOrderRelated: true,
       status: "Processed",
       memo: "Routine task leak fix",
-      receipt: "✓"
+      receipt: "✓",
+      glCode: "522.3",
+      glName: "Electrical Repairs"
     },
     {
       id: "exp5",
@@ -1164,13 +1195,15 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
       amount: 320.00,
       type: "Card",
       madeBy: "Bob Wilson (Technician)",
-      property: "Palo Alto Research Center",
+      property: "02 SUNNYVALE",
       workOrder: null,
       workOrderId: null,
       isWorkOrderRelated: false,
       status: "Processed",
       memo: "Monthly cleaning service",
-      receipt: "✓"
+      receipt: "✓",
+      glCode: "520.1",
+      glName: "Cleaning Services"
     },
     {
       id: "exp6",
@@ -1179,13 +1212,15 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
       amount: 12000.00,
       type: "Vendor",
       madeBy: "Sarah Kim (Property Manager)",
-      property: "Apple Park Campus",
+      property: "03 DOWNTOWN",
       workOrder: null,
       workOrderId: null,
       isWorkOrderRelated: false,
       status: "Processed",
       memo: "Quarterly maintenance",
-      receipt: "✓"
+      receipt: "✓",
+      glCode: "521.1",
+      glName: "Landscaping & Grounds"
     },
     {
       id: "exp7",
@@ -1194,13 +1229,15 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
       amount: 450.00,
       type: "Card",
       madeBy: "Jennifer Lopez (Technician)",
-      property: "Redwood City Office",
+      property: "01 STANFORD",
       workOrder: null,
       workOrderId: null,
       isWorkOrderRelated: false,
       status: "Processed",
       memo: "Regular office supplies",
-      receipt: "✓"
+      receipt: "✓",
+      glCode: "505.3",
+      glName: "Maintenance Supplies"
     },
     {
       id: "exp8",
@@ -1209,13 +1246,15 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
       amount: 750.00,
       type: "Vendor",
       madeBy: "Jessica Chen (Property Manager)",
-      property: "Stanford Graduate School of Business",
+      property: "01 STANFORD",
       workOrder: null,
       workOrderId: null,
       isWorkOrderRelated: false,
       status: "Pending",
       memo: "Critical system failure during finals week. Temporary solution in place.",
-      receipt: "✓"
+      receipt: "✓",
+      glCode: "522.0",
+      glName: "General Maintenance"
     },
     {
       id: "exp9",
@@ -1224,13 +1263,15 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
       amount: 200.00,
       type: "Vendor",
       madeBy: "Michael Rodriguez (Property Manager)",
-      property: "Mission Bay Tech Center",
+      property: "02 SUNNYVALE",
       workOrder: null,
       workOrderId: null,
       isWorkOrderRelated: false,
       status: "Not Uploaded",
       memo: "City inspector flagged elevator safety issues. Accommodation required for compliance.",
-      receipt: "✓"
+      receipt: "✓",
+      glCode: "523.1",
+      glName: "Elevator Services"
     }
   ]
 
@@ -1245,7 +1286,7 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
       
       // Property filter
       if (propertyFilter !== "All") {
-        if (propertyFilter === "Stanford GSB" && !expense.property.includes("Stanford")) return false
+        if (propertyFilter === "01 STANFORD" && !expense.property.includes("STANFORD")) return false
         if (propertyFilter === "Mission Bay" && !expense.property.includes("Mission Bay")) return false
       }
       
@@ -1576,7 +1617,7 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
           </SelectTrigger>
           <SelectContent className="bg-gray-800 border-gray-600">
             <SelectItem value="All" className="text-white">All</SelectItem>
-            <SelectItem value="Stanford GSB" className="text-white">Stanford GSB</SelectItem>
+                                    <SelectItem value="01 STANFORD" className="text-white">01 STANFORD</SelectItem>
             <SelectItem value="Mission Bay" className="text-white">Mission Bay</SelectItem>
           </SelectContent>
         </Select>
@@ -1626,7 +1667,7 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Made By</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Property</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Work Order</th>
-                  <th className="text-center py-3 px-4 font-medium text-gray-300">WO Related</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-300">GL Code</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Memo</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Receipt</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Actions</th>
@@ -1645,13 +1686,21 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
                     </td>
                     <td className="py-3 px-4 text-white">{expense.madeBy}</td>
                     <td className="py-3 px-4 text-white">{expense.property}</td>
-                    <td className="py-3 px-4 text-white">{expense.workOrder || 'N/A'}</td>
-                    <td className="py-3 px-4 text-center">
-                      {expense.isWorkOrderRelated ? (
-                        <CheckCircle className="h-4 w-4 text-green-400 mx-auto" />
+                    <td className="py-3 px-4">
+                      {expense.isWorkOrderRelated && expense.workOrderId ? (
+                        <button
+                          className="text-blue-400 hover:text-blue-300 underline cursor-pointer"
+                          onClick={() => window.location.href = `/workorders/${expense.workOrderId}?role=owner&returnTo=expenses`}
+                        >
+                          {expense.workOrder}
+                        </button>
                       ) : (
-                        <XCircle className="h-4 w-4 text-red-400 mx-auto" />
+                        <span className="text-white">{expense.workOrder || 'N/A'}</span>
                       )}
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="text-blue-300">{expense.glCode || 'N/A'}</div>
+                      <div className="text-xs text-blue-200">{expense.glName || ''}</div>
                     </td>
                     <td className="py-3 px-4 text-white">{expense.memo}</td>
                     <td className="py-3 px-4 text-center">
@@ -1714,6 +1763,7 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Made By</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Property</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Work Order</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-300">GL Code</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Billable</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Status</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-300">AI Flag</th>
@@ -1728,7 +1778,22 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
                     <td className="py-3 px-4 text-white">${error.amount.toFixed(2)}</td>
                     <td className="py-3 px-4 text-white">{error.madeBy}</td>
                     <td className="py-3 px-4 text-white">{error.property}</td>
-                    <td className="py-3 px-4 text-white">{error.workOrder || 'N/A'}</td>
+                    <td className="py-3 px-4">
+                      {error.workOrder ? (
+                        <button
+                          className="text-blue-400 hover:text-blue-300 underline cursor-pointer"
+                          onClick={() => window.location.href = `/workorders/job1?role=owner&returnTo=expenses`}
+                        >
+                          {error.workOrder}
+                        </button>
+                      ) : (
+                        <span className="text-white">N/A</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="text-blue-300">{error.glCode || 'N/A'}</div>
+                      <div className="text-xs text-blue-200">{error.glName || ''}</div>
+                    </td>
                     <td className="py-3 px-4">
                       <Badge className={error.billable === 'Yes' ? 'bg-green-600' : 'bg-red-600'}>
                         {error.billable}
@@ -1801,7 +1866,8 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Type</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Made By</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Property</th>
-                  <th className="text-center py-3 px-4 font-medium text-gray-300">WO Related</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-300">Work Order</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-300">GL Code</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Status</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Memo</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Receipt</th>
@@ -1821,12 +1887,21 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
                     </td>
                     <td className="py-3 px-4 text-white">{expense.madeBy}</td>
                     <td className="py-3 px-4 text-white">{expense.property}</td>
-                    <td className="py-3 px-4 text-center">
-                      {expense.isWorkOrderRelated ? (
-                        <CheckCircle className="h-4 w-4 text-green-400 mx-auto" />
+                    <td className="py-3 px-4">
+                      {expense.isWorkOrderRelated && expense.workOrderId ? (
+                        <button
+                          className="text-blue-400 hover:text-blue-300 underline cursor-pointer"
+                          onClick={() => window.location.href = `/workorders/${expense.workOrderId}?role=owner&returnTo=expenses`}
+                        >
+                          {expense.workOrder}
+                        </button>
                       ) : (
-                        <XCircle className="h-4 w-4 text-red-400 mx-auto" />
+                        <span className="text-white">{expense.workOrder || 'N/A'}</span>
                       )}
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="text-blue-300">{expense.glCode || 'N/A'}</div>
+                      <div className="text-xs text-blue-200">{expense.glName || ''}</div>
                     </td>
                     <td className="py-3 px-4">
                       <Badge className="bg-green-600 text-white">
@@ -1889,7 +1964,7 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
               </SelectTrigger>
               <SelectContent className="bg-gray-800 border-gray-600">
                 <SelectItem value="all" className="text-white">All</SelectItem>
-                <SelectItem value="stanford" className="text-white">Stanford GSB</SelectItem>
+                                      <SelectItem value="stanford" className="text-white">01 STANFORD</SelectItem>
                 <SelectItem value="mission" className="text-white">Mission Bay</SelectItem>
               </SelectContent>
             </Select>
@@ -1929,7 +2004,8 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Type</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Made By</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Property</th>
-                  <th className="text-center py-3 px-4 font-medium text-gray-300">WO Related</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-300">Work Order</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-300">GL Code</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Status</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Memo</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Receipt</th>
@@ -1949,12 +2025,21 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
                     </td>
                     <td className="py-3 px-4 text-white">{expense.madeBy}</td>
                     <td className="py-3 px-4 text-white">{expense.property}</td>
-                    <td className="py-3 px-4 text-center">
-                      {expense.isWorkOrderRelated ? (
-                        <CheckCircle className="h-4 w-4 text-green-400 mx-auto" />
+                    <td className="py-3 px-4">
+                      {expense.isWorkOrderRelated && expense.workOrderId ? (
+                        <button
+                          className="text-blue-400 hover:text-blue-300 underline cursor-pointer"
+                          onClick={() => window.location.href = `/workorders/${expense.workOrderId}?role=owner&returnTo=expenses`}
+                        >
+                          {expense.workOrder}
+                        </button>
                       ) : (
-                        <XCircle className="h-4 w-4 text-red-400 mx-auto" />
+                        <span className="text-white">{expense.workOrder || 'N/A'}</span>
                       )}
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="text-blue-300">{expense.glCode || 'N/A'}</div>
+                      <div className="text-xs text-blue-200">{expense.glName || ''}</div>
                     </td>
                     <td className="py-3 px-4">
                       <Badge className={
@@ -2502,21 +2587,21 @@ function PropertiesTab({ setActiveTab }: { setActiveTab?: (tab: string) => void 
   // Property-specific data for table
   const propertyTableData = [
     { 
-      name: "Stanford GSB", 
+      name: "01 STANFORD", 
       address: "655 Knight Way, Stanford, CA",
       staff: [
         { name: "Sarah Chen", role: "Property Manager", phone: "(650) 723-2146", email: "sarah.chen@stanford.edu" }
       ]
     },
     { 
-      name: "Sunnyvale 432", 
+      name: "02 SUNNYVALE", 
       address: "432 Sunnyvale Ave, Sunnyvale, CA",
       staff: [
         { name: "Mike Johnson", role: "Site Manager", phone: "(408) 555-0198", email: "mike.johnson@sunnyvale.com" }
       ]
     },
     { 
-      name: "Downtown Lofts", 
+      name: "03 DOWNTOWN", 
       address: "123 Market St, San Francisco, CA",
       staff: [
         { name: "Lisa Wong", role: "Building Manager", phone: "(415) 555-0142", email: "lisa.wong@dtlofts.com" }
@@ -2890,7 +2975,7 @@ function ForecastingTab({ setActiveTab, addMessage }: {
   const upcomingExpenses = [
     {
       id: 1,
-      property: "Redwood Shores",
+      property: "03 DOWNTOWN",
       date: "12/14/2024",
       category: "Maintenance",
       amount: 18500,
@@ -2898,7 +2983,7 @@ function ForecastingTab({ setActiveTab, addMessage }: {
     },
     {
       id: 2,
-      property: "Mission Bay",
+      property: "02 SUNNYVALE",
       date: "1/7/2025",
       category: "Capital Improvements",
       amount: 45000,
@@ -2906,7 +2991,7 @@ function ForecastingTab({ setActiveTab, addMessage }: {
     },
     {
       id: 3,
-      property: "Skyline Vista",
+      property: "01 STANFORD",
       date: "1/31/2025",
       category: "Recurring OpEx",
       amount: 12000,
@@ -4291,7 +4376,7 @@ function SmartInsightsTab() {
                 <div className="space-y-2">
                   {[
                     "What's the ROI on replacing HVAC in Building A?",
-                    "Should we repair or replace the elevator at Stanford GSB?",
+                    "Should we repair or replace the elevator at 01 STANFORD?",
                     "ROI analysis for LED lighting upgrade across all properties",
                     "Insurance optimization for leak detection system"
                   ].map((question, index) => (
@@ -4485,12 +4570,14 @@ function ReimbursementsTab({ setActiveTab, addMessage }: {
   const [selectedReimbursementPacket, setSelectedReimbursementPacket] = useState<any>(null)
   const [selectedExpenseItems, setSelectedExpenseItems] = useState<string[]>([])
   const [messageContent, setMessageContent] = useState("")
+  const [selectedGLAccount, setSelectedGLAccount] = useState<any>(null)
+  const [showGLAccountDialog, setShowGLAccountDialog] = useState(false)
   const [processForm, setProcessForm] = useState({
     workOrder: "HVAC System Maintenance - Annual Service",
     jobId: "#job1",
     amount: "241.00",
     notes: "",
-    ownerName: "Stanford GSB Administration",
+    ownerName: "01 STANFORD Administration",
     ownerPhone: "650-725-3341",
     ownerEmail: "owner@stanford.edu",
     ccEmail: "",
@@ -4530,12 +4617,346 @@ function ReimbursementsTab({ setActiveTab, addMessage }: {
     }
   ]
 
+  // Expense Report data structure
+  const expenseReportData = [
+    {
+      id: "exp_001",
+      date: "2024-12-15",
+      employee: "Sarah Johnson",
+      merchant: "Home Depot",
+      cost: 245.75,
+      property: "01 STANFORD",
+      billable: true,
+      receiptUrl: "/receipts/exp_001_receipt.pdf",
+      category: "Maintenance Supplies",
+      description: "Emergency plumbing repair materials"
+    },
+    {
+      id: "exp_002", 
+      date: "2024-12-14",
+      employee: "Mike Rodriguez",
+      merchant: "Office Depot",
+      cost: 89.99,
+      property: "02 SUNNYVALE",
+      billable: false,
+      receiptUrl: "/receipts/exp_002_receipt.pdf",
+      category: "Office Supplies",
+      description: "Administrative office materials"
+    },
+    {
+      id: "exp_003",
+      date: "2024-12-13",
+      employee: "Jennifer Davis",
+      merchant: "Ace Hardware",
+      cost: 67.50,
+      property: "01 STANFORD",
+      billable: true,
+      receiptUrl: "/receipts/exp_003_receipt.pdf",
+      category: "Tools & Equipment",
+      description: "Replacement tools for maintenance team"
+    },
+    {
+      id: "exp_004",
+      date: "2024-12-12",
+      employee: "David Chen",
+      merchant: "AutoZone",
+      cost: 156.25,
+      property: "02 SUNNYVALE",
+      billable: true,
+      receiptUrl: "/receipts/exp_004_receipt.pdf",
+      category: "Vehicle Maintenance",
+      description: "Service van maintenance and oil change"
+    },
+    {
+      id: "exp_005",
+      date: "2024-12-11",
+      employee: "Sarah Johnson",
+      merchant: "Staples",
+      cost: 34.99,
+      property: "01 STANFORD",
+      billable: false,
+      receiptUrl: "/receipts/exp_005_receipt.pdf",
+      category: "Office Supplies",
+      description: "Printer ink and paper supplies"
+    },
+    {
+      id: "exp_006",
+      date: "2024-12-10",
+      employee: "Mike Rodriguez",
+      merchant: "Lowe's",
+      cost: 312.45,
+      property: "03 DOWNTOWN",
+      billable: true,
+      receiptUrl: "/receipts/exp_006_receipt.pdf",
+      category: "Building Materials",
+      description: "Flooring repair materials for lobby"
+    },
+    {
+      id: "exp_007",
+      date: "2024-12-09",
+      employee: "Jennifer Davis",
+      merchant: "Costco Business",
+      cost: 127.88,
+      property: "02 SUNNYVALE",
+      billable: false,
+      receiptUrl: "/receipts/exp_007_receipt.pdf",
+      category: "Cleaning Supplies",
+      description: "Bulk cleaning supplies for janitorial"
+    },
+    {
+      id: "exp_008",
+      date: "2024-12-08",
+      employee: "David Chen",
+      merchant: "Best Buy",
+      cost: 189.99,
+      property: "01 STANFORD",
+      billable: true,
+      receiptUrl: "/receipts/exp_008_receipt.pdf",
+      category: "Technology",
+      description: "Security camera replacement parts"
+    },
+    {
+      id: "exp_009",
+      date: "2024-12-07",
+      employee: "Sarah Johnson",
+      merchant: "Amazon Business",
+      cost: 78.50,
+      property: "03 DOWNTOWN",
+      billable: true,
+      receiptUrl: "/receipts/exp_009_receipt.pdf",
+      category: "Maintenance Supplies",
+      description: "HVAC filter replacements"
+    },
+    {
+      id: "exp_010",
+      date: "2024-12-06",
+      employee: "Mike Rodriguez",
+      merchant: "Sherwin Williams",
+      cost: 234.67,
+      property: "02 SUNNYVALE",
+      billable: true,
+      receiptUrl: "/receipts/exp_010_receipt.pdf",
+      category: "Building Materials",
+      description: "Interior paint for unit renovations"
+    }
+  ]
+
+  // GL Account data structure for monthly reports
+  const glAccountData = [
+    {
+      id: "gl1",
+      account: "7200 - HVAC System Maintenance",
+      property: "01 STANFORD",
+      ptdActual: 2186.49,
+      ptdBudget: 1500,
+      ptdVariance: 686.49,
+      ptdVariancePercent: 45.8,
+      ytdActual: 15850,
+      ytdBudget: 12000,
+      ytdVariance: 3850,
+      ytdVariancePercent: 32.1,
+      annual: 35000,
+      status: "Submitted 2024-12-15",
+      pmMemo: "Emergency repairs and preventive maintenance completed.",
+      flagged: false
+    },
+    {
+      id: "gl2", 
+      account: "6425 - Property Insurance",
+      property: "01 STANFORD",
+      ptdActual: 1725,
+      ptdBudget: 1200,
+      ptdVariance: 525,
+      ptdVariancePercent: 43.8,
+      ytdActual: 8950,
+      ytdBudget: 7200,
+      ytdVariance: 1750,
+      ytdVariancePercent: 24.3,
+      annual: 18500,
+      status: "Submitted 2024-12-14",
+      pmMemo: "Annual policy renewal with coverage adjustments.",
+      flagged: false
+    },
+    {
+      id: "gl3",
+      account: "7315 - Water & Sewer",
+      property: "01 STANFORD", 
+      ptdActual: 945.5,
+      ptdBudget: 850,
+      ptdVariance: 95.5,
+      ptdVariancePercent: 11.2,
+      ytdActual: 5680,
+      ytdBudget: 5100,
+      ytdVariance: 580,
+      ytdVariancePercent: 11.4,
+      annual: 12200,
+      status: "Submitted 2024-12-13",
+      pmMemo: "Seasonal usage increase due to irrigation needs.",
+      flagged: false
+    },
+    {
+      id: "gl4",
+      account: "6100 - Building Maintenance",
+      property: "01 STANFORD",
+      ptdActual: 3245.75,
+      ptdBudget: 2800,
+      ptdVariance: 445.75,
+      ptdVariancePercent: 15.9,
+      ytdActual: 24580,
+      ytdBudget: 22400,
+      ytdVariance: 2180,
+      ytdVariancePercent: 9.7,
+      annual: 33600,
+      status: "Submitted 2024-12-12",
+      pmMemo: "Scheduled elevator maintenance and lobby repairs.",
+      flagged: false
+    },
+    {
+      id: "gl5",
+      account: "6150 - Landscaping",
+      property: "01 STANFORD",
+      ptdActual: 1850.25,
+      ptdBudget: 1600,
+      ptdVariance: 250.25,
+      ptdVariancePercent: 15.6,
+      ytdActual: 18750,
+      ytdBudget: 19200,
+      ytdVariance: -450,
+      ytdVariancePercent: -2.3,
+      annual: 28800,
+      status: "Pending Review",
+      pmMemo: "Winter maintenance and tree trimming services.",
+      flagged: true
+    },
+    {
+      id: "gl6",
+      account: "6200 - Cleaning Services",
+      property: "01 STANFORD",
+      ptdActual: 4125.50,
+      ptdBudget: 4000,
+      ptdVariance: 125.50,
+      ptdVariancePercent: 3.1,
+      ytdActual: 49500,
+      ytdBudget: 48000,
+      ytdVariance: 1500,
+      ytdVariancePercent: 3.1,
+      annual: 72000,
+      status: "Submitted 2024-12-11",
+      pmMemo: "Regular janitorial services with carpet cleaning.",
+      flagged: false
+    },
+    {
+      id: "gl7",
+      account: "6250 - Security Services",
+      property: "01 STANFORD",
+      ptdActual: 2890.00,
+      ptdBudget: 3000,
+      ptdVariance: -110.00,
+      ptdVariancePercent: -3.7,
+      ytdActual: 34680,
+      ytdBudget: 36000,
+      ytdVariance: -1320,
+      ytdVariancePercent: -3.7,
+      annual: 54000,
+      status: "Submitted 2024-12-10",
+      pmMemo: "24/7 security monitoring and patrol services.",
+      flagged: false
+    },
+    {
+      id: "gl8",
+      account: "6300 - Utilities - Electric",
+      property: "01 STANFORD",
+      ptdActual: 8450.75,
+      ptdBudget: 7800,
+      ptdVariance: 650.75,
+      ptdVariancePercent: 8.3,
+      ytdActual: 89250,
+      ytdBudget: 93600,
+      ytdVariance: -4350,
+      ytdVariancePercent: -4.6,
+      annual: 140400,
+      status: "Submitted 2024-12-09",
+      pmMemo: "Higher winter usage due to increased lighting.",
+      flagged: false
+    },
+    {
+      id: "gl9",
+      account: "6350 - Utilities - Gas",
+      property: "01 STANFORD",
+      ptdActual: 3675.25,
+      ptdBudget: 4200,
+      ptdVariance: -524.75,
+      ptdVariancePercent: -12.5,
+      ytdActual: 42850,
+      ytdBudget: 50400,
+      ytdVariance: -7550,
+      ytdVariancePercent: -15.0,
+      annual: 75600,
+      status: "Submitted 2024-12-08",
+      pmMemo: "Lower than expected usage due to mild weather.",
+      flagged: false
+    },
+    {
+      id: "gl10",
+      account: "7500 - Capital Improvements",
+      property: "01 STANFORD",
+      ptdActual: 15750.00,
+      ptdBudget: 12000,
+      ptdVariance: 3750.00,
+      ptdVariancePercent: 31.3,
+      ytdActual: 125400,
+      ytdBudget: 144000,
+      ytdVariance: -18600,
+      ytdVariancePercent: -12.9,
+      annual: 216000,
+      status: "Pending Review",
+      pmMemo: "Elevator modernization project Phase 1 completed.",
+      flagged: true
+    },
+    {
+      id: "gl11",
+      account: "6400 - Property Management Fees",
+      property: "01 STANFORD",
+      ptdActual: 5500.00,
+      ptdBudget: 5500,
+      ptdVariance: 0.00,
+      ptdVariancePercent: 0.0,
+      ytdActual: 66000,
+      ytdBudget: 66000,
+      ytdVariance: 0,
+      ytdVariancePercent: 0.0,
+      annual: 99000,
+      status: "Submitted 2024-12-07",
+      pmMemo: "Standard monthly management fee as per contract.",
+      flagged: false
+    },
+    {
+      id: "gl12",
+      account: "6450 - Legal & Professional",
+      property: "01 STANFORD",
+      ptdActual: 1250.00,
+      ptdBudget: 800,
+      ptdVariance: 450.00,
+      ptdVariancePercent: 56.3,
+      ytdActual: 8750,
+      ytdBudget: 9600,
+      ytdVariance: -850,
+      ytdVariancePercent: -8.9,
+      annual: 14400,
+      status: "Submitted 2024-12-06",
+      pmMemo: "Legal consultation for tenant lease agreements.",
+      flagged: false
+    }
+  ]
+
   const reimbursementPackets = [
     {
       id: "RMB-2024-001",
       status: "PENDING REVIEW",
       submittedBy: "Sarah Johnson",
       submittedDate: "6/30/2024",
+      property: "01 STANFORD",
+      propertyName: "Stanford Office Complex",
       total: 45650,
       expenseCount: 4,
       trustBalance: 285000,
@@ -4545,6 +4966,8 @@ function ReimbursementsTab({ setActiveTab, addMessage }: {
         "Bay Area HVAC Solutions: Over $15K threshold",
         "Pacific Landscaping: Missing receipt"
       ],
+      glAccounts: glAccountData,
+      expenseReport: expenseReportData,
       expenses: [
         {
           id: "exp1",
@@ -4558,7 +4981,7 @@ function ReimbursementsTab({ setActiveTab, addMessage }: {
           flagged: true,
           status: "Uploaded",
           madeBy: "Jessica Chen (Property Manager)",
-          property: "Redwood Shores Office Complex",
+          property: "01 STANFORD",
           workOrder: "HVAC System Maintenance - Annual Service",
           workOrderId: "job1",
           isWorkOrderRelated: true,
@@ -4576,7 +4999,7 @@ function ReimbursementsTab({ setActiveTab, addMessage }: {
           flagged: false,
           status: "Uploaded",
           madeBy: "David Chen (Property Manager)",
-          property: "Redwood Shores Office Complex",
+          property: "01 STANFORD",
           workOrder: null,
           workOrderId: null,
           isWorkOrderRelated: false,
@@ -4594,7 +5017,7 @@ function ReimbursementsTab({ setActiveTab, addMessage }: {
           flagged: false,
           status: "Uploaded",
           madeBy: "Mike Rodriguez (Property Manager)",
-          property: "Redwood Shores Office Complex",
+          property: "01 STANFORD",
           workOrder: "Security System Upgrade - Building A",
           workOrderId: "job2",
           isWorkOrderRelated: true,
@@ -4612,7 +5035,7 @@ function ReimbursementsTab({ setActiveTab, addMessage }: {
           flagged: true,
           status: "Missing",
           madeBy: "Sarah Johnson (Property Manager)",
-          property: "Redwood Shores Office Complex",
+          property: "01 STANFORD",
           workOrder: null,
           workOrderId: null,
           isWorkOrderRelated: false,
@@ -4625,6 +5048,8 @@ function ReimbursementsTab({ setActiveTab, addMessage }: {
       status: "PENDING REVIEW",
       submittedBy: "James Wilson",
       submittedDate: "7/1/2024",
+      property: "02 SUNNYVALE",
+      propertyName: "Sunnyvale Business Park",
       total: 23750,
       expenseCount: 2,
       trustBalance: 195000,
@@ -4633,6 +5058,8 @@ function ReimbursementsTab({ setActiveTab, addMessage }: {
       flaggedItems: [
         "Metro Office Supplies: Non-billable expense over $5K"
       ],
+      glAccounts: glAccountData.map(gl => ({ ...gl, property: "02 SUNNYVALE" })),
+      expenseReport: expenseReportData.map(exp => ({ ...exp, property: exp.property === "01 STANFORD" ? "02 SUNNYVALE" : exp.property })),
       expenses: [
         {
           id: "exp5",
@@ -4646,7 +5073,7 @@ function ReimbursementsTab({ setActiveTab, addMessage }: {
           flagged: false,
           status: "Uploaded",
           madeBy: "James Wilson (Property Manager)",
-          property: "Mission Bay Tech Campus",
+          property: "02 SUNNYVALE",
           workOrder: "Emergency Plumbing Repair - Kitchen Sink",
           workOrderId: "job3",
           isWorkOrderRelated: true,
@@ -4664,7 +5091,7 @@ function ReimbursementsTab({ setActiveTab, addMessage }: {
           flagged: true,
           status: "Flagged",
           madeBy: "Jennifer Davis (Property Manager)",
-          property: "Mission Bay Tech Campus",
+          property: "02 SUNNYVALE",
           workOrder: null,
           workOrderId: null,
           isWorkOrderRelated: false,
@@ -4700,13 +5127,80 @@ function ReimbursementsTab({ setActiveTab, addMessage }: {
   }
 
   const handleExportPDF = (packetId: string) => {
-    // Create a mock PDF blob and download it
-    const pdfData = `Monthly Reimbursement Report - ${packetId}\n\nGenerated: ${new Date().toLocaleString()}\n\nThis is a sample PDF export.`
-    const blob = new Blob([pdfData], { type: 'application/pdf' })
+    const packet = reimbursementPackets.find(p => p.id === packetId)
+    if (!packet) return
+
+    // Create comprehensive PDF content for GL report
+    const currentDate = new Date().toLocaleString()
+    const pdfContent = `MONTHLY GL REPORT - ${packet.propertyName.toUpperCase()}
+${packet.property} | Period: December 2024
+Generated: ${currentDate}
+
+=============================================================================
+TRUST ACCOUNT DETAILS
+=============================================================================
+Bank: Wells Fargo
+Account: ****2847  
+Routing: 121000248
+Current Balance: $${packet.trustBalance.toLocaleString()}
+Release Amount: $${packet.releaseAmount.toLocaleString()}
+Remaining Balance: $${packet.remainingBalance.toLocaleString()}
+
+=============================================================================
+GL ACCOUNT VARIANCE REPORT
+=============================================================================
+
+${packet.glAccounts.map(account => {
+  const ptdActual = '$' + account.ptdActual.toFixed(2)
+  const ptdBudget = '$' + account.ptdBudget.toFixed(2)
+  const ptdVariance = (account.ptdVariance >= 0 ? '+' : '') + '$' + account.ptdVariance.toFixed(2)
+  const ptdVariancePercent = (account.ptdVariancePercent >= 0 ? '+' : '') + account.ptdVariancePercent.toFixed(1) + '%'
+  const ytdActual = '$' + account.ytdActual.toFixed(2)
+  const ytdBudget = '$' + account.ytdBudget.toFixed(2)
+  const ytdVariance = (account.ytdVariance >= 0 ? '+' : '') + '$' + account.ytdVariance.toFixed(2)
+  const ytdVariancePercent = (account.ytdVariancePercent >= 0 ? '+' : '') + account.ytdVariancePercent.toFixed(1) + '%'
+  const annual = '$' + account.annual.toFixed(2)
+  
+  return account.account.padEnd(35) + ' | ' + 
+         ptdActual.padStart(12) + ' | ' + 
+         ptdBudget.padStart(12) + ' | ' + 
+         ptdVariance.padStart(12) + ' | ' + 
+         ptdVariancePercent.padStart(8) + ' | ' + 
+         ytdActual.padStart(12) + ' | ' + 
+         ytdBudget.padStart(12) + ' | ' + 
+         ytdVariance.padStart(12) + ' | ' + 
+         ytdVariancePercent.padStart(8) + ' | ' + 
+         annual.padStart(12) + ' | ' + 
+         account.status.padEnd(15) + ' | ' + 
+         account.pmMemo
+}).join('\n')}
+
+=============================================================================
+FLAGGED ITEMS REQUIRING ATTENTION
+=============================================================================
+${packet.flaggedItems.map(item => '• ' + item).join('\n')}
+
+=============================================================================
+SUMMARY
+=============================================================================
+Reimbursement Packet: ${packet.id}
+Status: ${packet.status}
+Submitted By: ${packet.submittedBy}
+Submitted Date: ${packet.submittedDate}
+Total Amount: $${packet.total.toLocaleString()}
+Number of Expenses: ${packet.expenseCount}
+
+Property Manager Comments:
+${packet.glAccounts.filter(acc => acc.flagged).map(acc => '- ' + acc.account + ': ' + acc.pmMemo).join('\n')}
+
+This GL variance report has been included with the monthly reimbursement processing.
+Report generated on ${currentDate} for ${packet.propertyName}.`
+
+    const blob = new Blob([pdfContent], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `${packetId}_report.pdf`
+    a.download = `GL_Report_${packet.property}_${packetId}_${new Date().toISOString().split('T')[0]}.txt`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -4731,6 +5225,11 @@ function ReimbursementsTab({ setActiveTab, addMessage }: {
         setExpenseDetailDialog(expense)
       }
     }
+  }
+
+  const handleViewGLAccount = (account: any) => {
+    setSelectedGLAccount(account)
+    setShowGLAccountDialog(true)
   }
 
   const handleSendMessage = (isFlag: boolean) => {
@@ -4762,13 +5261,54 @@ function ReimbursementsTab({ setActiveTab, addMessage }: {
   }
 
   const handleExportReport = () => {
-    // Create a mock CSV report and download it
-    const csvData = `Monthly Reimbursement Report\nGenerated: ${new Date().toLocaleString()}\n\nPacket ID,Status,Submitted By,Date,Total,Expense Count\n`
-    const blob = new Blob([csvData], { type: 'text/csv' })
+    // Create comprehensive CSV report with GL account data
+    const currentDate = new Date().toISOString().split('T')[0]
+    
+    let csvContent = `Monthly GL Reimbursement Report\nGenerated: ${new Date().toLocaleString()}\n\n`
+    
+    // Summary section
+    csvContent += `SUMMARY\n`
+    csvContent += `Packet ID,Property,Property Name,Status,Submitted By,Date,Total,Expense Count,Trust Balance,Release Amount,Remaining Balance\n`
+    
+    reimbursementPackets.forEach(packet => {
+      csvContent += `${packet.id},${packet.property},${packet.propertyName},${packet.status},${packet.submittedBy},${packet.submittedDate},${packet.total},${packet.expenseCount},${packet.trustBalance},${packet.releaseAmount},${packet.remainingBalance}\n`
+    })
+    
+    csvContent += `\n\nGL ACCOUNT DETAILS\n`
+    csvContent += `Packet ID,Property,Account,PTD Actual,PTD Budget,PTD Variance,PTD Variance %,YTD Actual,YTD Budget,YTD Variance,YTD Variance %,Annual,Status,PM Memo,Flagged\n`
+    
+    // GL Account details
+    reimbursementPackets.forEach(packet => {
+      packet.glAccounts.forEach(account => {
+        csvContent += `${packet.id},${account.property},"${account.account}",${account.ptdActual.toFixed(2)},${account.ptdBudget.toFixed(2)},${account.ptdVariance.toFixed(2)},${account.ptdVariancePercent.toFixed(1)},${account.ytdActual.toFixed(2)},${account.ytdBudget.toFixed(2)},${account.ytdVariance.toFixed(2)},${account.ytdVariancePercent.toFixed(1)},${account.annual.toFixed(2)},"${account.status}","${account.pmMemo}",${account.flagged}\n`
+      })
+    })
+    
+    csvContent += `\n\nFLAGGED ITEMS\n`
+    csvContent += `Packet ID,Property,Flagged Item\n`
+    
+    // Flagged items
+    reimbursementPackets.forEach(packet => {
+      packet.flaggedItems.forEach(item => {
+        csvContent += `${packet.id},${packet.property},"${item}"\n`
+      })
+    })
+
+    csvContent += `\n\nEXPENSE REPORT DETAILS\n`
+    csvContent += `Packet ID,Property,Date,Employee,Merchant,Cost,Billable,Category,Description,Receipt URL\n`
+    
+    // Expense report details
+    reimbursementPackets.forEach(packet => {
+      packet.expenseReport.forEach(expense => {
+        csvContent += `${packet.id},${expense.property},${expense.date},"${expense.employee}","${expense.merchant}",${expense.cost.toFixed(2)},${expense.billable ? 'Yes' : 'No'},"${expense.category}","${expense.description}",${expense.receiptUrl}\n`
+      })
+    })
+
+    const blob = new Blob([csvContent], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `monthly_reimbursements_${new Date().toISOString().split('T')[0]}.csv`
+    a.download = `GL_Reimbursement_Report_${currentDate}.csv`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -4920,55 +5460,248 @@ function ReimbursementsTab({ setActiveTab, addMessage }: {
                 </ul>
               </div>
 
-              {/* Expense Table */}
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="border-b border-gray-700">
-                    <tr>
-                      <th className="text-left py-3 px-4 font-medium text-gray-300">Vendor</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-300">Amount</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-300">Category</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-300">GL Code</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-300">Receipt</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-300">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {packet.expenses.map((expense) => (
-                      <tr key={expense.id} className="border-b border-gray-700">
-                        <td className="py-3 px-4">
-                          <div className="flex items-center gap-2">
-                            {expense.flagged && (
-                              <AlertTriangle className="h-4 w-4 text-yellow-400" />
-                            )}
-                            <span className="text-white">{expense.vendor}</span>
-                          </div>
-                        </td>
-                        <td className="py-3 px-4 text-white">
-                          ${expense.amount.toLocaleString()}
-                        </td>
-                        <td className="py-3 px-4 text-white">{expense.category}</td>
-                        <td className="py-3 px-4 text-white">{expense.glCode}</td>
-                        <td className="py-3 px-4 text-center">
-                          {expense.receipt ? (
-                            <CheckCircle className="h-4 w-4 text-green-400 mx-auto" />
-                          ) : (
-                            <XCircle className="h-4 w-4 text-red-400 mx-auto" />
-                          )}
-                        </td>
-                        <td className="py-3 px-4">
-                          <Badge className={
-                            expense.status === "Uploaded" ? "bg-green-600" :
-                            expense.status === "Flagged" ? "bg-yellow-600" :
-                            "bg-red-600"
-                          }>
-                            {expense.status}
-                          </Badge>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              {/* Monthly GL Report Table */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium text-white flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4" />
+                    Budget Variances - {packet.propertyName}
+                  </h4>
+                  <div className="text-sm text-gray-400">
+                    Property: {packet.property} | Period: December 2024
+                  </div>
+                </div>
+                
+                {/* Trust Account Details */}
+                <div className="bg-gray-700 rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Building className="h-4 w-4 text-blue-400" />
+                    <span className="font-medium text-white">Trust Account Details</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <div className="text-gray-400">Bank:</div>
+                      <div className="text-white font-medium">Wells Fargo</div>
+                    </div>
+                    <div>
+                      <div className="text-gray-400">Account:</div>
+                      <div className="text-white font-medium">****2847</div>
+                    </div>
+                    <div>
+                      <div className="text-gray-400">Routing:</div>
+                      <div className="text-white font-medium">121000248</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* GL Report Table - Scrollable */}
+                <div className="bg-gray-700 rounded-lg">
+                  <div className="max-h-96 overflow-y-auto">
+                    <table className="w-full text-xs">
+                      <thead className="sticky top-0 bg-gray-700 border-b border-gray-600">
+                        <tr>
+                          <th className="text-left py-3 px-2 font-medium text-gray-300 min-w-[200px]">Account</th>
+                          <th className="text-right py-3 px-2 font-medium text-gray-300 min-w-[80px]">PTD Actual</th>
+                          <th className="text-right py-3 px-2 font-medium text-gray-300 min-w-[80px]">PTD Budget</th>
+                          <th className="text-right py-3 px-2 font-medium text-gray-300 min-w-[80px]">Variance</th>
+                          <th className="text-right py-3 px-2 font-medium text-gray-300 min-w-[60px]">% Var</th>
+                          <th className="text-right py-3 px-2 font-medium text-gray-300 min-w-[80px]">YTD Actual</th>
+                          <th className="text-right py-3 px-2 font-medium text-gray-300 min-w-[80px]">YTD Budget</th>
+                          <th className="text-right py-3 px-2 font-medium text-gray-300 min-w-[80px]">Variance</th>
+                          <th className="text-right py-3 px-2 font-medium text-gray-300 min-w-[60px]">% Var</th>
+                          <th className="text-right py-3 px-2 font-medium text-gray-300 min-w-[80px]">Annual</th>
+                          <th className="text-center py-3 px-2 font-medium text-gray-300 min-w-[80px]">Status</th>
+                          <th className="text-left py-3 px-2 font-medium text-gray-300 min-w-[200px]">PM Memo</th>
+                          <th className="text-center py-3 px-2 font-medium text-gray-300 min-w-[60px]">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {packet.glAccounts.map((account) => (
+                          <tr key={account.id} className="border-b border-gray-600 hover:bg-gray-600/50">
+                            <td className="py-2 px-2">
+                              <div className="flex items-center gap-1">
+                                {account.flagged && (
+                                  <AlertTriangle className="h-3 w-3 text-yellow-400 flex-shrink-0" />
+                                )}
+                                <span className="text-white text-xs font-medium">{account.account}</span>
+                              </div>
+                              <div className="text-xs text-gray-400">{account.property}</div>
+                            </td>
+                            <td className="py-2 px-2 text-right text-white font-mono">
+                              ${account.ptdActual.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                            </td>
+                            <td className="py-2 px-2 text-right text-white font-mono">
+                              ${account.ptdBudget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                            </td>
+                            <td className={`py-2 px-2 text-right font-mono ${account.ptdVariance >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                              {account.ptdVariance >= 0 ? '+' : ''}${account.ptdVariance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                            </td>
+                            <td className={`py-2 px-2 text-right font-mono text-xs ${account.ptdVariancePercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                              {account.ptdVariancePercent >= 0 ? '+' : ''}{account.ptdVariancePercent.toFixed(1)}%
+                            </td>
+                            <td className="py-2 px-2 text-right text-white font-mono">
+                              ${account.ytdActual.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                            </td>
+                            <td className="py-2 px-2 text-right text-white font-mono">
+                              ${account.ytdBudget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                            </td>
+                            <td className={`py-2 px-2 text-right font-mono ${account.ytdVariance >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                              {account.ytdVariance >= 0 ? '+' : ''}${account.ytdVariance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                            </td>
+                            <td className={`py-2 px-2 text-right font-mono text-xs ${account.ytdVariancePercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                              {account.ytdVariancePercent >= 0 ? '+' : ''}{account.ytdVariancePercent.toFixed(1)}%
+                            </td>
+                            <td className="py-2 px-2 text-right text-white font-mono">
+                              ${account.annual.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                            </td>
+                            <td className="py-2 px-2 text-center">
+                              <div className="flex items-center justify-center gap-1">
+                                {account.status.includes("Submitted") ? (
+                                  <CheckCircle className="h-3 w-3 text-green-400" />
+                                ) : (
+                                  <Clock className="h-3 w-3 text-yellow-400" />
+                                )}
+                                <span className="text-xs text-gray-300">{account.status.replace("Submitted ", "")}</span>
+                              </div>
+                            </td>
+                            <td className="py-2 px-2 text-xs text-gray-300 max-w-[200px] truncate" title={account.pmMemo}>
+                              {account.pmMemo}
+                            </td>
+                            <td className="py-2 px-2 text-center">
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="h-6 w-12 bg-blue-600 border-blue-600 text-white hover:bg-blue-700 text-xs"
+                                onClick={() => handleViewGLAccount(account)}
+                              >
+                                View
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                
+                <div className="text-xs text-gray-400 italic">
+                  * This GL variance report will be included with the monthly reimbursement processing
+                </div>
+              </div>
+
+              {/* Expense Report Table */}
+              <div className="space-y-4 mt-8">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium text-white flex items-center gap-2">
+                    <Receipt className="h-4 w-4" />
+                    Expense Report - {packet.propertyName}
+                  </h4>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleExportExpenseReport(packet.id)}
+                      className="bg-purple-600 border-purple-600 text-white hover:bg-purple-700 text-xs"
+                    >
+                      <FileText className="h-3 w-3 mr-1" />
+                      Export PDF
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleExportReport}
+                      className="bg-purple-600 border-purple-600 text-white hover:bg-purple-700 text-xs"
+                    >
+                      <FileSpreadsheet className="h-3 w-3 mr-1" />
+                      Export CSV
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Expense Summary Cards */}
+                <div className="grid grid-cols-4 gap-3">
+                  <div className="bg-gray-700 rounded-lg p-3 text-center">
+                    <div className="text-lg font-bold text-white">{packet.expenseReport.length}</div>
+                    <div className="text-xs text-gray-400">Total Expenses</div>
+                  </div>
+                  <div className="bg-gray-700 rounded-lg p-3 text-center">
+                    <div className="text-lg font-bold text-white">${packet.expenseReport.reduce((sum, exp) => sum + exp.cost, 0).toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
+                    <div className="text-xs text-gray-400">Total Cost</div>
+                  </div>
+                  <div className="bg-gray-700 rounded-lg p-3 text-center">
+                    <div className="text-lg font-bold text-green-400">{packet.expenseReport.filter(exp => exp.billable).length}</div>
+                    <div className="text-xs text-gray-400">Billable</div>
+                  </div>
+                  <div className="bg-gray-700 rounded-lg p-3 text-center">
+                    <div className="text-lg font-bold text-red-400">{packet.expenseReport.filter(exp => !exp.billable).length}</div>
+                    <div className="text-xs text-gray-400">Non-Billable</div>
+                  </div>
+                </div>
+
+                {/* Expense Report Table - Scrollable */}
+                <div className="bg-gray-700 rounded-lg">
+                  <div className="max-h-80 overflow-y-auto">
+                    <table className="w-full text-xs">
+                      <thead className="sticky top-0 bg-gray-700 border-b border-gray-600">
+                        <tr>
+                          <th className="text-left py-3 px-2 font-medium text-gray-300 min-w-[80px]">Date</th>
+                          <th className="text-left py-3 px-2 font-medium text-gray-300 min-w-[120px]">Employee</th>
+                          <th className="text-left py-3 px-2 font-medium text-gray-300 min-w-[120px]">Merchant</th>
+                          <th className="text-right py-3 px-2 font-medium text-gray-300 min-w-[80px]">Cost</th>
+                          <th className="text-center py-3 px-2 font-medium text-gray-300 min-w-[80px]">Property</th>
+                          <th className="text-center py-3 px-2 font-medium text-gray-300 min-w-[80px]">Billable</th>
+                          <th className="text-center py-3 px-2 font-medium text-gray-300 min-w-[80px]">Receipt</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {packet.expenseReport.map((expense) => (
+                          <tr key={expense.id} className="border-b border-gray-600 hover:bg-gray-600/50">
+                            <td className="py-2 px-2 text-white font-mono">
+                              {new Date(expense.date).toLocaleDateString()}
+                            </td>
+                            <td className="py-2 px-2 text-white">
+                              {expense.employee}
+                            </td>
+                            <td className="py-2 px-2 text-white">
+                              {expense.merchant}
+                            </td>
+                            <td className="py-2 px-2 text-right text-white font-mono">
+                              ${expense.cost.toLocaleString(undefined, {minimumFractionDigits: 2})}
+                            </td>
+                            <td className="py-2 px-2 text-center">
+                              <Badge className="bg-blue-600 text-white text-xs">
+                                {expense.property}
+                              </Badge>
+                            </td>
+                            <td className="py-2 px-2 text-center">
+                              <Badge className={expense.billable ? "bg-green-600 text-white" : "bg-red-600 text-white"}>
+                                {expense.billable ? "Billable" : "Non-Billable"}
+                              </Badge>
+                            </td>
+                            <td className="py-2 px-2 text-center">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-6 w-16 bg-gray-600 border-gray-600 text-white hover:bg-gray-500 text-xs"
+                                onClick={() => {
+                                  // Open receipt in new tab
+                                  window.open(expense.receiptUrl, '_blank')
+                                }}
+                              >
+                                <Eye className="h-3 w-3 mr-1" />
+                                View
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div className="text-xs text-gray-400 italic">
+                  * Employee expense report for reimbursement processing and audit trail
+                </div>
               </div>
 
               {/* Trust Account Impact Summary */}
@@ -4985,7 +5718,7 @@ function ReimbursementsTab({ setActiveTab, addMessage }: {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Button
                   variant="outline"
                   onClick={() => handleViewDetails(packet.id)}
@@ -4997,10 +5730,18 @@ function ReimbursementsTab({ setActiveTab, addMessage }: {
                 <Button
                   variant="outline"
                   onClick={() => handleExportPDF(packet.id)}
-                  className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
+                  className="bg-green-600 border-green-600 text-white hover:bg-green-700"
                 >
                   <FileText className="h-4 w-4 mr-2" />
-                  Export PDF
+                  Export GL Report (PDF)
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleExportReport}
+                  className="bg-green-600 border-green-600 text-white hover:bg-green-700"
+                >
+                  <FileSpreadsheet className="h-4 w-4 mr-2" />
+                  Export GL Report (CSV)
                 </Button>
                 <Button
                   variant="outline"
@@ -5306,6 +6047,178 @@ function ReimbursementsTab({ setActiveTab, addMessage }: {
               className="border-gray-600 text-gray-300"
             >
               Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* GL Account Details Dialog */}
+      <Dialog open={showGLAccountDialog} onOpenChange={setShowGLAccountDialog}>
+        <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>GL Account Details - Budget Variance Analysis</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Detailed breakdown of budget vs actual performance
+            </DialogDescription>
+          </DialogHeader>
+          {selectedGLAccount && (
+            <div className="space-y-6">
+              {/* Account Header */}
+              <div className="bg-gray-800 p-4 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold text-white">{selectedGLAccount.account}</h3>
+                    <p className="text-sm text-gray-400">Property: {selectedGLAccount.property}</p>
+                  </div>
+                  <div className="text-right">
+                    {selectedGLAccount.flagged && (
+                      <Badge className="bg-yellow-600 text-white">Flagged for Review</Badge>
+                    )}
+                    <div className="text-xs text-gray-400 mt-1">Status: {selectedGLAccount.status}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Financial Summary Grid */}
+              <div className="grid grid-cols-2 gap-6">
+                {/* PTD Analysis */}
+                <div className="bg-gray-800 p-4 rounded-lg">
+                  <h4 className="font-medium text-white mb-3 flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Period to Date (PTD) Analysis
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Actual:</span>
+                      <span className="text-white font-mono">${selectedGLAccount.ptdActual.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Budget:</span>
+                      <span className="text-white font-mono">${selectedGLAccount.ptdBudget.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                    </div>
+                    <div className="border-t border-gray-600 pt-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Variance:</span>
+                        <span className={`font-mono ${selectedGLAccount.ptdVariance >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                          {selectedGLAccount.ptdVariance >= 0 ? '+' : ''}${selectedGLAccount.ptdVariance.toLocaleString(undefined, {minimumFractionDigits: 2})}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Variance %:</span>
+                        <span className={`font-mono ${selectedGLAccount.ptdVariancePercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                          {selectedGLAccount.ptdVariancePercent >= 0 ? '+' : ''}{selectedGLAccount.ptdVariancePercent.toFixed(1)}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* YTD Analysis */}
+                <div className="bg-gray-800 p-4 rounded-lg">
+                  <h4 className="font-medium text-white mb-3 flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4" />
+                    Year to Date (YTD) Analysis
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Actual:</span>
+                      <span className="text-white font-mono">${selectedGLAccount.ytdActual.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Budget:</span>
+                      <span className="text-white font-mono">${selectedGLAccount.ytdBudget.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                    </div>
+                    <div className="border-t border-gray-600 pt-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Variance:</span>
+                        <span className={`font-mono ${selectedGLAccount.ytdVariance >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                          {selectedGLAccount.ytdVariance >= 0 ? '+' : ''}${selectedGLAccount.ytdVariance.toLocaleString(undefined, {minimumFractionDigits: 2})}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Variance %:</span>
+                        <span className={`font-mono ${selectedGLAccount.ytdVariancePercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                          {selectedGLAccount.ytdVariancePercent >= 0 ? '+' : ''}{selectedGLAccount.ytdVariancePercent.toFixed(1)}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Annual Budget */}
+              <div className="bg-gray-800 p-4 rounded-lg">
+                <h4 className="font-medium text-white mb-3 flex items-center gap-2">
+                  <Target className="h-4 w-4" />
+                  Annual Budget Overview
+                </h4>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white">${selectedGLAccount.annual.toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
+                    <div className="text-xs text-gray-400">Annual Budget</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white">${selectedGLAccount.ytdActual.toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
+                    <div className="text-xs text-gray-400">YTD Actual</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white">${(selectedGLAccount.annual - selectedGLAccount.ytdActual).toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
+                    <div className="text-xs text-gray-400">Remaining Budget</div>
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <Progress 
+                    value={(selectedGLAccount.ytdActual / selectedGLAccount.annual) * 100} 
+                    className="h-2"
+                  />
+                  <div className="text-xs text-gray-400 mt-1 text-center">
+                    {((selectedGLAccount.ytdActual / selectedGLAccount.annual) * 100).toFixed(1)}% of annual budget used
+                  </div>
+                </div>
+              </div>
+
+              {/* Property Manager Notes */}
+              <div className="bg-gray-800 p-4 rounded-lg">
+                <h4 className="font-medium text-white mb-3 flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Property Manager Notes
+                </h4>
+                <p className="text-gray-300">{selectedGLAccount.pmMemo}</p>
+                <div className="mt-3 text-xs text-gray-400">
+                  Last Updated: {selectedGLAccount.status.includes("Submitted") ? selectedGLAccount.status.replace("Submitted ", "") : "Pending"}
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowGLAccountDialog(false)}
+              className="border-gray-600 text-gray-300"
+            >
+              Close
+            </Button>
+            <Button
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={() => {
+                // Export individual account details
+                if (selectedGLAccount) {
+                  const accountData = `GL Account Details - ${selectedGLAccount.account}\nProperty: ${selectedGLAccount.property}\nGenerated: ${new Date().toLocaleString()}\n\nPTD Actual: $${selectedGLAccount.ptdActual.toFixed(2)}\nPTD Budget: $${selectedGLAccount.ptdBudget.toFixed(2)}\nPTD Variance: ${selectedGLAccount.ptdVariance >= 0 ? '+' : ''}$${selectedGLAccount.ptdVariance.toFixed(2)} (${selectedGLAccount.ptdVariancePercent.toFixed(1)}%)\n\nYTD Actual: $${selectedGLAccount.ytdActual.toFixed(2)}\nYTD Budget: $${selectedGLAccount.ytdBudget.toFixed(2)}\nYTD Variance: ${selectedGLAccount.ytdVariance >= 0 ? '+' : ''}$${selectedGLAccount.ytdVariance.toFixed(2)} (${selectedGLAccount.ytdVariancePercent.toFixed(1)}%)\n\nAnnual Budget: $${selectedGLAccount.annual.toFixed(2)}\nRemaining Budget: $${(selectedGLAccount.annual - selectedGLAccount.ytdActual).toFixed(2)}\nBudget Utilization: ${((selectedGLAccount.ytdActual / selectedGLAccount.annual) * 100).toFixed(1)}%\n\nStatus: ${selectedGLAccount.status}\nProperty Manager Notes: ${selectedGLAccount.pmMemo}`
+                  
+                  const blob = new Blob([accountData], { type: 'text/plain' })
+                  const url = URL.createObjectURL(blob)
+                  const a = document.createElement('a')
+                  a.href = url
+                  a.download = `GL_Account_${selectedGLAccount.account.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.txt`
+                  document.body.appendChild(a)
+                  a.click()
+                  document.body.removeChild(a)
+                  URL.revokeObjectURL(url)
+                }
+              }}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export Details
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -6203,6 +7116,7 @@ function CollateralTab() {
   const [collateralFilterProperty, setCollateralFilterProperty] = useState('all')
   const [collateralFilterDocType, setCollateralFilterDocType] = useState('all')
   const [collateralFilterUploadedBy, setCollateralFilterUploadedBy] = useState('all')
+  const [collateralFilterArea, setCollateralFilterArea] = useState('all')
   const [collateralFilterDateFrom, setCollateralFilterDateFrom] = useState('')
   const [collateralFilterDateTo, setCollateralFilterDateTo] = useState('')
   const [collateralUploadDialogOpen, setCollateralUploadDialogOpen] = useState(false)
@@ -6405,11 +7319,11 @@ function CollateralTab() {
         "What HVAC warranties are expiring soon?",
         
         // Property-Specific Queries
-        "Find all receipts for Stanford GSB property",
-        "Show me Sunnyvale 432 maintenance costs",
+              "Find all receipts for 01 STANFORD property",
+      "Show me 02 SUNNYVALE maintenance costs",
         "What repairs were done at Mission Bay?",
         "Find all Redwood Shores expenses",
-        "Show me Stanford GSB inspection reports",
+        "Show me 01 STANFORD inspection reports",
         "What vendors service our properties?",
         
         // Insurance & Compliance
@@ -6495,13 +7409,13 @@ function CollateralTab() {
     // Mock AI reasoning and document matching
     if (queryLower.includes('hvac') || queryLower.includes('heating') || queryLower.includes('cooling')) {
       return {
-        summary: "Found 8 HVAC-related documents totaling $12,450 in expenses across 3 properties. The most recent service was a $3,200 repair at Stanford GSB on December 15th.",
+        summary: "Found 8 HVAC-related documents totaling $12,450 in expenses across 3 properties. The most recent service was a $3,200 repair at 01 STANFORD on December 15th.",
         documents: collateralDocuments.filter(doc => 
           doc.filename.toLowerCase().includes('hvac') || 
           doc.tags.some(tag => tag.toLowerCase().includes('hvac'))
         ).slice(0, 4),
         insights: [
-          "Stanford GSB has the highest HVAC maintenance costs ($8,200 YTD)",
+          "01 STANFORD has the highest HVAC maintenance costs ($8,200 YTD)",
           "Most common issue: Filter replacements and duct cleaning",
           "Average cost per HVAC service: $1,556"
         ]
@@ -6558,6 +7472,14 @@ function CollateralTab() {
       // Property filter
       if (collateralFilterProperty !== 'all' && doc.propertyId !== collateralFilterProperty) {
         return false
+      }
+      
+      // Area filter
+      if (collateralFilterArea !== 'all') {
+        const property = propertyOptions.find(p => p.id === doc.propertyId)
+        if (!property || property.area !== collateralFilterArea) {
+          return false
+        }
       }
       
       // Document type filter
@@ -6749,7 +7671,7 @@ function CollateralTab() {
       </div>
 
       {/* Search and Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-7 gap-4 mb-6">
         <div className="md:col-span-2">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -6771,6 +7693,19 @@ function CollateralTab() {
             {propertyOptions.map((property) => (
               <SelectItem key={property.id} value={property.id} className="text-white">
                 {property.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={collateralFilterArea} onValueChange={setCollateralFilterArea}>
+          <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+            <SelectValue placeholder="All Areas" />
+          </SelectTrigger>
+          <SelectContent className="bg-gray-800 border-gray-600">
+            {areaOptions.map((area) => (
+              <SelectItem key={area.id} value={area.id} className="text-white">
+                {area.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -6927,7 +7862,7 @@ function CollateralTab() {
                                     <div>
                                       <label className="block text-sm font-medium text-gray-300 mb-2">Property Assignment</label>
                                       <select className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white">
-                                        <option value="prop1">Stanford GSB</option>
+                                        <option value="prop1">01 STANFORD</option>
                                         <option value="prop2">Mission Bay Tech Campus</option>
                                         <option value="prop3">Downtown Office Tower</option>
                                       </select>
