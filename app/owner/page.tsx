@@ -1673,8 +1673,11 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                {filteredExpensesNeedingApproval.map((expense) => (
+            </table>
+            <div className="max-h-48 overflow-y-auto">
+              <table className="w-full text-sm">
+                <tbody>
+                  {filteredExpensesNeedingApproval.map((expense) => (
                   <tr key={expense.id} className="border-b border-gray-700 hover:bg-gray-700">
                     <td className="py-3 px-4 text-white">{expense.date}</td>
                     <td className="py-3 px-4 text-white">{expense.merchant}</td>
@@ -1734,9 +1737,10 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
                       </div>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -1874,8 +1878,11 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
                   <th className="text-left py-3 px-4 font-medium text-gray-300">Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                {filteredProcessedExpenses.map((expense) => (
+            </table>
+            <div className="max-h-48 overflow-y-auto">
+              <table className="w-full text-sm">
+                <tbody>
+                  {filteredProcessedExpenses.map((expense) => (
                   <tr key={expense.id} className="border-b border-gray-700 hover:bg-gray-700">
                     <td className="py-3 px-4 text-white">{expense.date}</td>
                     <td className="py-3 px-4 text-white">{expense.merchant}</td>
@@ -1923,9 +1930,10 @@ function ExpensesTab({ setActiveTab, setSharedMessages }: {
                       </Button>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </CardContent>
       </Card>

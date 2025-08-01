@@ -6803,14 +6803,6 @@ Central Office`,
           </nav>
           <div className="mt-8 pt-8 border-t border-gray-800">
             <div className="space-y-2">
-              <Button variant="outline" className="w-full justify-start bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700 hover:text-white">
-                <Database className="h-4 w-4 mr-2" />
-                Sync All
-              </Button>
-              <Button variant="outline" className="w-full justify-start bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700 hover:text-white">
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
-              </Button>
               <Button 
                 variant="outline" 
                 onClick={() => {
@@ -9415,6 +9407,32 @@ Central Office`,
             )}
             {activeTab === "wallet" && (
               <>
+                {/* How Expenses Work Callout Box */}
+                <div className="mb-6 p-4 bg-gray-800 border border-gray-700 rounded-lg">
+                  <h4 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                    <Info className="h-5 w-5 text-blue-400" />
+                    How Expenses Work
+                  </h4>
+                  <ul className="text-sm text-gray-300 space-y-2">
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-400 mt-1">•</span>
+                      <span>Expense data is pulled from SMS, email, and card transaction logs</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-400 mt-1">•</span>
+                      <span>When available, property and memo fields are auto-filled using invoice or receipt text, leveraging AI</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-400 mt-1">•</span>
+                      <span>GL codes shown here are filtered to match your budget GLs only—non-matching GLs are excluded</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-400 mt-1">•</span>
+                      <span>Variance and completion comments are system-generated using AI tailored to past expense data, with final details completed by PMs</span>
+                    </li>
+                  </ul>
+                </div>
+
                 <div className="mb-8">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-semibold text-white mb-4">
@@ -9538,7 +9556,10 @@ Central Office`,
                           <th className="text-left py-3 px-4 font-semibold text-white">Actions</th>
                         </tr>
                       </thead>
-                      <tbody>
+                    </table>
+                    <div className="max-h-48 overflow-y-auto">
+                      <table className="min-w-full text-sm">
+                        <tbody>
                         {filterExpensesByRole([...transactions, ...technicianTransactions])
                           .filter(txn => txn.status === 'pending' || !txn.jobId)
                           .sort((a, b) => {
@@ -9844,9 +9865,10 @@ Central Office`,
                               </tr>
                             );
                           })}
-                      </tbody>
-                    </table>
-                                </div>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Completed Expenses Table */}
@@ -9875,7 +9897,10 @@ Central Office`,
                           <th className="text-left py-3 px-4 font-semibold text-white">Actions</th>
                         </tr>
                       </thead>
-                      <tbody>
+                    </table>
+                    <div className="max-h-48 overflow-y-auto">
+                      <table className="min-w-full text-sm">
+                        <tbody>
                         {filterExpensesByRole([...transactions, ...technicianTransactions])
                           .filter(txn => txn.status === 'reconciled' && (txn.jobId || txnAssignments[txn.id]?.job))
                           .sort((a, b) => {
@@ -10158,10 +10183,11 @@ Central Office`,
                               </tr>
                             );
                           })}
-                      </tbody>
-                    </table>
-                        </div>
-                        </div>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
 
 
               </>
