@@ -10189,6 +10189,489 @@ Central Office`,
                   </div>
                 </div>
 
+                {/* Due Comments Table - Duplicated from Variance Comments */}
+                <Card className="bg-gray-800 border-gray-700 mb-6">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <Calculator className="h-5 w-5" />
+                      Due Comments - Budget Variance Items Requiring Comments
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full text-xs">
+                        <thead className="border-b border-gray-600">
+                          <tr>
+                            <th className="text-left py-2 px-2 text-gray-400 font-medium">Account</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">PTD Actual</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">PTD Budget</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">PTD Variance</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">YTD Actual</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">YTD Budget</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">YTD Variance</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">Annual</th>
+                            <th className="text-left py-2 px-2 text-gray-400 font-medium">Status</th>
+                            <th className="text-left py-2 px-2 text-gray-400 font-medium">AI Suggestion</th>
+                            <th className="text-left py-2 px-2 text-gray-400 font-medium">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(() => {
+                            // Variance items for expenses tab - same data as variance comments
+                            const varianceItems = [
+                              {
+                                id: 1,
+                                property: 'Stanford GSB',
+                                propertyCode: 'ap172',
+                                glCode: '7200',
+                                glName: 'Total Repairs and Maintenance',
+                                subGL: '7215 - Plumbing Repairs',
+                                ptdActual: 23750,
+                                ptdBudget: 15000,
+                                ptdVariance: 8750,
+                                ptdVariancePercent: 58.3,
+                                ytdActual: 89420,
+                                ytdBudget: 75000,
+                                ytdVariance: 14420,
+                                ytdVariancePercent: 19.2,
+                                annual: 300000,
+                                reason: 'Emergency plumbing system replacement - quarterly overage',
+                                hasComment: false,
+                                aiSuggestion: 'PTD overage due to emergency plumbing failure. Suggest explaining emergency nature, age of pipes (20+ years), and preventive maintenance schedule.',
+                                urgency: 'high'
+                              },
+                              {
+                                id: 2,
+                                property: 'Stanford GSB', 
+                                propertyCode: 'ap172',
+                                glCode: '6100',
+                                glName: 'Total Advertising and Marketing',
+                                subGL: '6125 - Leasing Commissions',
+                                ptdActual: 18076,
+                                ptdBudget: 20492,
+                                ptdVariance: -2416,
+                                ptdVariancePercent: -11.8,
+                                ytdActual: 65280,
+                                ytdBudget: 58000,
+                                ytdVariance: 7280,
+                                ytdVariancePercent: 12.6,
+                                annual: 232000,
+                                reason: 'Higher leasing commission rates for Q4 renewals',
+                                hasComment: false,
+                                aiSuggestion: 'YTD variance over 5% threshold. Detail commission structure changes and impact on future lease deals.',
+                                urgency: 'high'
+                              },
+                              {
+                                id: 3,
+                                property: 'Mission Bay',
+                                propertyCode: 'mb401',
+                                glCode: '5200', 
+                                glName: 'Total Turnover',
+                                subGL: '5235 - Kitchen Renovations',
+                                ptdActual: 17213,
+                                ptdBudget: 31379,
+                                ptdVariance: -14166,
+                                ptdVariancePercent: -45.1,
+                                ytdActual: 78945,
+                                ytdBudget: 125000,
+                                ytdVariance: -46055,
+                                ytdVariancePercent: -36.8,
+                                annual: 500000,
+                                reason: 'Delayed kitchen renovation projects',
+                                hasComment: true,
+                                comment: 'Kitchen renovation projects delayed due to permit approval process and appliance supply chain issues. Projects rescheduled for Q1 next year.',
+                                aiSuggestion: 'Good explanation. Consider adding timeline for delayed projects and budget carryover plan.',
+                                urgency: 'medium'
+                              },
+                              {
+                                id: 4,
+                                property: 'Mission Bay',
+                                propertyCode: 'mb401',
+                                glCode: '7400',
+                                glName: 'Operating Expenses before Replacements', 
+                                subGL: '7420 - Electrical Systems',
+                                ptdActual: 45823,
+                                ptdBudget: 32000,
+                                ptdVariance: 13823,
+                                ptdVariancePercent: 43.2,
+                                ytdActual: 156780,
+                                ytdBudget: 128000,
+                                ytdVariance: 28780,
+                                ytdVariancePercent: 22.5,
+                                annual: 512000,
+                                reason: 'Increased electrical system maintenance and upgrades',
+                                hasComment: false,
+                                aiSuggestion: 'Significant overage. Break down emergency repairs vs planned upgrades. Include energy efficiency measures planned.',
+                                urgency: 'high'
+                              },
+                              {
+                                id: 5,
+                                property: 'Stanford GSB',
+                                propertyCode: 'ap172',
+                                glCode: '8100',
+                                glName: 'Total Debt Service',
+                                subGL: '8115 - HVAC Equipment Financing',
+                                ptdActual: 28500,
+                                ptdBudget: 22000,
+                                ptdVariance: 6500,
+                                ptdVariancePercent: 29.5,
+                                ytdActual: 114000,
+                                ytdBudget: 88000,
+                                ytdVariance: 26000,
+                                ytdVariancePercent: 29.5,
+                                annual: 352000,
+                                reason: 'New HVAC equipment financing payments',
+                                hasComment: false,
+                                aiSuggestion: 'Overage above $5K threshold. Detail equipment financing terms, energy savings projections, and ROI timeline.',
+                                urgency: 'medium'
+                              },
+                              {
+                                id: 6,
+                                property: 'Stanford GSB',
+                                propertyCode: 'ap172',
+                                glCode: '4100',
+                                glName: 'Total Net Income',
+                                subGL: '4125 - Parking Revenue',
+                                ptdActual: 35200,
+                                ptdBudget: 28000,
+                                ptdVariance: 7200,
+                                ptdVariancePercent: 25.7,
+                                ytdActual: 140800,
+                                ytdBudget: 112000,
+                                ytdVariance: 28800,
+                                ytdVariancePercent: 25.7,
+                                annual: 448000,
+                                reason: 'Above budget parking revenue - rate increases',
+                                hasComment: false,
+                                aiSuggestion: 'Positive variance exceeds 5% threshold. Detail parking rate changes, occupancy rates, and sustainability of performance.',
+                                urgency: 'low'
+                              }
+                            ];
+
+                            return varianceItems
+                              .filter(item => selectedVarianceProperty === 'all' || item.property === 
+                                getPropertiesForRole('pm').find(p => p.id.toString() === selectedVarianceProperty)?.name)
+                              .map((item) => (
+                                <tr key={item.id} className="border-b border-gray-700 hover:bg-gray-700/50">
+                                  <td className="py-2 px-2">
+                                    <div className="text-white text-xs font-medium">{item.propertyCode} - {item.property}</div>
+                                    <div className="text-blue-300 text-xs">{item.subGL}</div>
+                                  </td>
+                                  <td className="text-right py-2 px-2 text-white text-xs font-mono">
+                                    ${item.ptdActual.toLocaleString()}
+                                  </td>
+                                  <td className="text-right py-2 px-2 text-gray-300 text-xs font-mono">
+                                    ${item.ptdBudget.toLocaleString()}
+                                  </td>
+                                  <td className="text-right py-2 px-2 text-xs font-mono">
+                                    <span className={item.ptdVariance >= 0 ? 'text-red-300' : 'text-green-300'}>
+                                      {item.ptdVariance >= 0 ? '+' : ''}${item.ptdVariance.toLocaleString()}
+                                    </span>
+                                    <div className={`text-xs ${item.ptdVariance >= 0 ? 'text-red-400' : 'text-green-400'}`}>
+                                      ({item.ptdVariance >= 0 ? '+' : ''}{item.ptdVariancePercent.toFixed(1)}%)
+                                    </div>
+                                  </td>
+                                  <td className="text-right py-2 px-2 text-white text-xs font-mono">
+                                    ${item.ytdActual.toLocaleString()}
+                                  </td>
+                                  <td className="text-right py-2 px-2 text-gray-300 text-xs font-mono">
+                                    ${item.ytdBudget.toLocaleString()}
+                                  </td>
+                                  <td className="text-right py-2 px-2 text-xs font-mono">
+                                    <span className={item.ytdVariance >= 0 ? 'text-red-300' : 'text-green-300'}>
+                                      {item.ytdVariance >= 0 ? '+' : ''}${item.ytdVariance.toLocaleString()}
+                                    </span>
+                                    <div className={`text-xs ${item.ytdVariance >= 0 ? 'text-red-400' : 'text-green-400'}`}>
+                                      ({item.ytdVariance >= 0 ? '+' : ''}{item.ytdVariancePercent.toFixed(1)}%)
+                                    </div>
+                                  </td>
+                                  <td className="text-right py-2 px-2 text-gray-300 text-xs font-mono">
+                                    ${item.annual.toLocaleString()}
+                                  </td>
+                                  <td className="py-2 px-2">
+                                    <Badge 
+                                      className={`text-xs ${
+                                        item.urgency === 'high' 
+                                          ? 'bg-red-900 text-red-300 border-red-700' 
+                                          : item.urgency === 'medium'
+                                          ? 'bg-yellow-900 text-yellow-300 border-yellow-700'
+                                          : 'bg-blue-900 text-blue-300 border-blue-700'
+                                      }`}
+                                    >
+                                      {item.urgency === 'high' ? 'Due Now' : item.urgency === 'medium' ? 'Due Soon' : 'Review'}
+                                    </Badge>
+                                  </td>
+                                  <td className="py-2 px-2 max-w-48">
+                                    <div className="text-xs text-purple-300 truncate">
+                                      {item.aiSuggestion}
+                                    </div>
+                                  </td>
+                                  <td className="py-2 px-2">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className={`text-xs h-7 px-2 ${
+                                        item.hasComment 
+                                          ? 'border-blue-600 text-blue-400 hover:bg-blue-600/20' 
+                                          : 'border-red-600 text-red-400 hover:bg-red-600/20'
+                                      }`}
+                                      onClick={() => {
+                                        setSelectedVarianceItem(item);
+                                        setVarianceCommentForm({
+                                          comment: item.comment || '',
+                                          reason: item.reason || '',
+                                          correctiveAction: ''
+                                        });
+                                        setVarianceCommentDialog(true);
+                                      }}
+                                    >
+                                      <AlertTriangle className="h-3 w-3 mr-1" />
+                                      {item.hasComment ? 'Edit' : 'Add'}
+                                    </Button>
+                                  </td>
+                                </tr>
+                              ));
+                          })()}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Submitted Comments Table */}
+                <Card className="bg-gray-800 border-gray-700">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5" />
+                      Submitted Comments - Completed Variance Explanations
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto max-h-96 overflow-y-auto">
+                      <table className="min-w-full text-xs">
+                        <thead className="border-b border-gray-600 sticky top-0 bg-gray-800">
+                          <tr>
+                            <th className="text-left py-2 px-2 text-gray-400 font-medium">Account</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">PTD Actual</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">PTD Budget</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">PTD Variance</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">YTD Actual</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">YTD Budget</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">YTD Variance</th>
+                            <th className="text-right py-2 px-2 text-gray-400 font-medium">Annual</th>
+                            <th className="text-left py-2 px-2 text-gray-400 font-medium">Status</th>
+                            <th className="text-left py-2 px-2 text-gray-400 font-medium">AI Suggestion</th>
+                            <th className="text-left py-2 px-2 text-gray-400 font-medium">Comment</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(() => {
+                            // Submitted variance comments for expenses tab
+                            const submittedVarianceItems = [
+                              {
+                                id: 101,
+                                property: 'Mission Bay',
+                                propertyCode: 'mb401',
+                                glCode: '5200', 
+                                glName: 'Total Turnover',
+                                subGL: '5235 - Kitchen Renovations',
+                                ptdActual: 17213,
+                                ptdBudget: 31379,
+                                ptdVariance: -14166,
+                                ptdVariancePercent: -45.1,
+                                ytdActual: 78945,
+                                ytdBudget: 125000,
+                                ytdVariance: -46055,
+                                ytdVariancePercent: -36.8,
+                                annual: 500000,
+                                reason: 'Delayed kitchen renovation projects',
+                                hasComment: true,
+                                comment: 'Kitchen renovation projects delayed due to permit approval process and appliance supply chain issues. Projects rescheduled for Q1 next year.',
+                                aiSuggestion: 'Good explanation. Consider adding timeline for delayed projects and budget carryover plan.',
+                                urgency: 'completed',
+                                submittedDate: '2024-12-15'
+                              },
+                              {
+                                id: 102,
+                                property: 'Stanford GSB',
+                                propertyCode: 'ap172',
+                                glCode: '6400',
+                                glName: 'Total Insurance and Taxes',
+                                subGL: '6425 - Property Insurance',
+                                ptdActual: 42500,
+                                ptdBudget: 35000,
+                                ptdVariance: 7500,
+                                ptdVariancePercent: 21.4,
+                                ytdActual: 170000,
+                                ytdBudget: 140000,
+                                ytdVariance: 30000,
+                                ytdVariancePercent: 21.4,
+                                annual: 560000,
+                                reason: 'Insurance premium increase due to market conditions',
+                                hasComment: true,
+                                comment: 'Property insurance premiums increased 21% due to current market conditions and increased property values. Rate locked for 3-year term to avoid future volatility.',
+                                aiSuggestion: 'Comprehensive explanation covering market factors and future planning.',
+                                urgency: 'completed',
+                                submittedDate: '2024-12-14'
+                              },
+                              {
+                                id: 103,
+                                property: 'Mission Bay',
+                                propertyCode: 'mb401',
+                                glCode: '7300',
+                                glName: 'Total Utilities',
+                                subGL: '7315 - Water & Sewer',
+                                ptdActual: 18750,
+                                ptdBudget: 14000,
+                                ptdVariance: 4750,
+                                ptdVariancePercent: 33.9,
+                                ytdActual: 75000,
+                                ytdBudget: 56000,
+                                ytdVariance: 19000,
+                                ytdVariancePercent: 33.9,
+                                annual: 224000,
+                                reason: 'Water main leak and increased usage rates',
+                                hasComment: true,
+                                comment: 'Water costs increased due to undiscovered water main leak in Q3 that was repaired in October. Additionally, municipal water rates increased 8% effective July 1st.',
+                                aiSuggestion: 'Clear explanation of both emergency issue and rate changes.',
+                                urgency: 'completed',
+                                submittedDate: '2024-12-13'
+                              },
+                              {
+                                id: 104,
+                                property: 'Stanford GSB',
+                                propertyCode: 'ap172',
+                                glCode: '5100',
+                                glName: 'Total Administration',
+                                subGL: '5125 - Legal & Professional',
+                                ptdActual: 28900,
+                                ptdBudget: 22000,
+                                ptdVariance: 6900,
+                                ptdVariancePercent: 31.4,
+                                ytdActual: 115600,
+                                ytdBudget: 88000,
+                                ytdVariance: 27600,
+                                ytdVariancePercent: 31.4,
+                                annual: 352000,
+                                reason: 'Tenant lease renegotiation legal fees',
+                                hasComment: true,
+                                comment: 'Higher legal fees due to complex lease renegotiation with anchor tenant. Process required additional legal counsel specializing in retail leases, resulting in favorable 10-year extension.',
+                                aiSuggestion: 'Excellent detail on ROI justification for legal expenses.',
+                                urgency: 'completed',
+                                submittedDate: '2024-12-12'
+                              },
+                              {
+                                id: 105,
+                                property: 'Mission Bay',
+                                propertyCode: 'mb401',
+                                glCode: '8200',
+                                glName: 'Total Reserves and Replacements',
+                                subGL: '8235 - Roof Replacement Reserve',
+                                ptdActual: 55000,
+                                ptdBudget: 40000,
+                                ptdVariance: 15000,
+                                ptdVariancePercent: 37.5,
+                                ytdActual: 220000,
+                                ytdBudget: 160000,
+                                ytdVariance: 60000,
+                                ytdVariancePercent: 37.5,
+                                annual: 640000,
+                                reason: 'Accelerated roof replacement due to storm damage',
+                                hasComment: true,
+                                comment: 'Roof replacement accelerated due to storm damage in September. Insurance covered 70% of costs. New roof includes 20-year warranty and improved energy efficiency features.',
+                                aiSuggestion: 'Good coverage of insurance and long-term benefits.',
+                                urgency: 'completed',
+                                submittedDate: '2024-12-11'
+                              },
+                              {
+                                id: 106,
+                                property: 'Stanford GSB',
+                                propertyCode: 'ap172',
+                                glCode: '7100',
+                                glName: 'Total Repairs and Maintenance',
+                                subGL: '7145 - Elevator Maintenance',
+                                ptdActual: 31200,
+                                ptdBudget: 24000,
+                                ptdVariance: 7200,
+                                ptdVariancePercent: 30.0,
+                                ytdActual: 124800,
+                                ytdBudget: 96000,
+                                ytdVariance: 28800,
+                                ytdVariancePercent: 30.0,
+                                annual: 384000,
+                                reason: 'Elevator modernization and code compliance',
+                                hasComment: true,
+                                comment: 'Elevator maintenance costs increased due to required modernization to meet new accessibility codes. Work includes controller upgrades and safety system enhancements completed in October.',
+                                aiSuggestion: 'Comprehensive explanation of compliance requirements.',
+                                urgency: 'completed',
+                                submittedDate: '2024-12-10'
+                              }
+                            ];
+
+                            return submittedVarianceItems
+                              .filter(item => selectedVarianceProperty === 'all' || item.property === 
+                                getPropertiesForRole('pm').find(p => p.id.toString() === selectedVarianceProperty)?.name)
+                              .map((item) => (
+                                <tr key={item.id} className="border-b border-gray-700 hover:bg-gray-700/50">
+                                  <td className="py-2 px-2">
+                                    <div className="text-white text-xs font-medium">{item.propertyCode} - {item.property}</div>
+                                    <div className="text-blue-300 text-xs">{item.subGL}</div>
+                                  </td>
+                                  <td className="text-right py-2 px-2 text-white text-xs font-mono">
+                                    ${item.ptdActual.toLocaleString()}
+                                  </td>
+                                  <td className="text-right py-2 px-2 text-gray-300 text-xs font-mono">
+                                    ${item.ptdBudget.toLocaleString()}
+                                  </td>
+                                  <td className="text-right py-2 px-2 text-xs font-mono">
+                                    <span className={item.ptdVariance >= 0 ? 'text-red-300' : 'text-green-300'}>
+                                      {item.ptdVariance >= 0 ? '+' : ''}${item.ptdVariance.toLocaleString()}
+                                    </span>
+                                    <div className={`text-xs ${item.ptdVariance >= 0 ? 'text-red-400' : 'text-green-400'}`}>
+                                      ({item.ptdVariance >= 0 ? '+' : ''}{item.ptdVariancePercent.toFixed(1)}%)
+                                    </div>
+                                  </td>
+                                  <td className="text-right py-2 px-2 text-white text-xs font-mono">
+                                    ${item.ytdActual.toLocaleString()}
+                                  </td>
+                                  <td className="text-right py-2 px-2 text-gray-300 text-xs font-mono">
+                                    ${item.ytdBudget.toLocaleString()}
+                                  </td>
+                                  <td className="text-right py-2 px-2 text-xs font-mono">
+                                    <span className={item.ytdVariance >= 0 ? 'text-red-300' : 'text-green-300'}>
+                                      {item.ytdVariance >= 0 ? '+' : ''}${item.ytdVariance.toLocaleString()}
+                                    </span>
+                                    <div className={`text-xs ${item.ytdVariance >= 0 ? 'text-red-400' : 'text-green-400'}`}>
+                                      ({item.ytdVariance >= 0 ? '+' : ''}{item.ytdVariancePercent.toFixed(1)}%)
+                                    </div>
+                                  </td>
+                                  <td className="text-right py-2 px-2 text-gray-300 text-xs font-mono">
+                                    ${item.annual.toLocaleString()}
+                                  </td>
+                                  <td className="py-2 px-2">
+                                    <Badge className="text-xs bg-green-900 text-green-300 border-green-700">
+                                      Submitted {item.submittedDate}
+                                    </Badge>
+                                  </td>
+                                  <td className="py-2 px-2 max-w-48">
+                                    <div className="text-xs text-purple-300 truncate">
+                                      {item.aiSuggestion}
+                                    </div>
+                                  </td>
+                                  <td className="py-2 px-2 max-w-64">
+                                    <div className="text-xs text-gray-300 truncate">
+                                      {item.comment}
+                                    </div>
+                                  </td>
+                                </tr>
+                              ));
+                          })()}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+
 
               </>
             )}
@@ -16598,6 +17081,126 @@ Central Office`,
           </div>
         </div>
       </div>
+
+      {/* Global Variance Comment Dialog - Available from both Variance Comments and Expenses tabs */}
+      <Dialog open={varianceCommentDialog} onOpenChange={setVarianceCommentDialog}>
+        <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-red-400" />
+              {selectedVarianceItem?.hasComment ? 'Edit' : 'Add'} Variance Comment
+            </DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Provide detailed explanation for budget variance for owner review
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedVarianceItem && (
+            <div className="space-y-6">
+              {/* Variance Details */}
+              <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
+                <h4 className="text-red-300 font-medium mb-3">Variance Details</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-400">Property:</span>
+                    <span className="text-white ml-2">{selectedVarianceItem.propertyCode} - {selectedVarianceItem.property}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400">Account:</span>
+                    <span className="text-blue-300 ml-2">{selectedVarianceItem.subGL}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400">PTD Budget:</span>
+                    <span className="text-white ml-2">${selectedVarianceItem.ptdBudget.toLocaleString()}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400">PTD Actual:</span>
+                    <span className="text-red-300 ml-2 font-semibold">${selectedVarianceItem.ptdActual.toLocaleString()}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400">PTD Variance:</span>
+                    <span className={`ml-2 font-semibold ${selectedVarianceItem.ptdVariance >= 0 ? 'text-red-300' : 'text-green-300'}`}>
+                      {selectedVarianceItem.ptdVariance >= 0 ? '+' : ''}${selectedVarianceItem.ptdVariance.toLocaleString()} ({selectedVarianceItem.ptdVariance >= 0 ? '+' : ''}{selectedVarianceItem.ptdVariancePercent.toFixed(1)}%)
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400">YTD Variance:</span>
+                    <span className={`ml-2 font-semibold ${selectedVarianceItem.ytdVariance >= 0 ? 'text-red-300' : 'text-green-300'}`}>
+                      {selectedVarianceItem.ytdVariance >= 0 ? '+' : ''}${selectedVarianceItem.ytdVariance.toLocaleString()} ({selectedVarianceItem.ytdVariance >= 0 ? '+' : ''}{selectedVarianceItem.ytdVariancePercent.toFixed(1)}%)
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* AI Suggestion */}
+              <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Bot className="h-4 w-4 text-purple-400" />
+                  <span className="text-purple-300 font-medium">AI Writing Suggestion</span>
+                </div>
+                <div className="text-purple-200 text-sm">
+                  {selectedVarianceItem.aiSuggestion}
+                </div>
+              </div>
+
+              {/* Comment Form */}
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-gray-300 mb-2 block">Variance Explanation</Label>
+                  <Textarea
+                    value={varianceCommentForm.comment}
+                    onChange={(e) => setVarianceCommentForm(prev => ({ ...prev, comment: e.target.value }))}
+                    className="bg-gray-800 border-gray-600 text-white h-24"
+                    placeholder="Provide detailed explanation of what caused this variance..."
+                  />
+                </div>
+
+                <div>
+                  <Label className="text-gray-300 mb-2 block">Root Cause</Label>
+                  <Input
+                    value={varianceCommentForm.reason}
+                    onChange={(e) => setVarianceCommentForm(prev => ({ ...prev, reason: e.target.value }))}
+                    className="bg-gray-800 border-gray-600 text-white"
+                    placeholder="Emergency repair, code compliance, etc."
+                  />
+                </div>
+
+                <div>
+                  <Label className="text-gray-300 mb-2 block">Corrective Action Plan</Label>
+                  <Textarea
+                    value={varianceCommentForm.correctiveAction}
+                    onChange={(e) => setVarianceCommentForm(prev => ({ ...prev, correctiveAction: e.target.value }))}
+                    className="bg-gray-800 border-gray-600 text-white h-20"
+                    placeholder="Steps being taken to prevent similar overages in the future..."
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setVarianceCommentDialog(false)}
+              className="border-gray-600 text-gray-300"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                // Save variance comment
+                alert(`Variance comment saved for ${selectedVarianceItem?.subGL} at ${selectedVarianceItem?.propertyCode}. Owner will be notified.`)
+                setVarianceCommentDialog(false)
+              }}
+              className="bg-green-600 hover:bg-green-700 text-white"
+              disabled={!varianceCommentForm.comment.trim()}
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Submit Comment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
